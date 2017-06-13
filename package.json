@@ -33,7 +33,7 @@
     "serve-favicon": "*",
     "session-file-store": "^1.0.0",
     "smpp": "^0.3.1",
-    "socket.io": "^2.0.2",
+    "socket.io": "^2.0.3",
     "underscore": "^1.8.3",
     "underscore-node": "^0.1.2"
   },
