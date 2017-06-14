@@ -114,7 +114,10 @@ var smppServer = smpp.createServer(function(session) {
     });
 
     smppSession.on('submit_sm', function(pdu) {
-        //  var msgid = getMsgId(); // generate a message_id for this message.
+
+        var foundClients = [];
+        var resultObject = {};
+
         console.log("submit_sm received, sequence_number:" + pdu.sequence_number + " isResponse:" + pdu.isResponse());
 
         smppSession.send(pdu.response());
@@ -130,20 +133,17 @@ var smppServer = smpp.createServer(function(session) {
 
         console.log("more messages:" + pdu.more_messages_to_send);
 
-        var msisdnFound = false;
-
         // retrieve the session information based on the msisdn
         for (i = 0; i < clients.length; i++) {
             if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.msisdn === pdu.destination_addr) {
-                resObj = clients[i].moRecord;
-                msisdnFound = true;
-                break;
+                resultObject = clients[i].moRecord;
+                resultObject.mtText = resObj.mtText + mtText;
+                foundClients.push(resultObject);
             }
         }
-        if (msisdnFound) resObj.mtText = resObj.mtText + mtText;
 
         // if the session is found but there are more messages to come, then concatenate the message and stop (wait for final message before sending)
-        if (msisdnFound && pdu.more_messages_to_send === 1) {
+        if (foundClients.length > 0 && pdu.more_messages_to_send === 1) {
             console.log("more mesages to send, so returning");
             return;
         }
@@ -153,15 +153,16 @@ var smppServer = smpp.createServer(function(session) {
         //   2) retrieve the saved/concatenated message string
         //   3) reset the message string to blank
         //   4) send the result back to the client using the saved session
-        if (msisdnFound && (pdu.more_messages_to_send === 0 ||
+        if (foundClients.length > 0 && (pdu.more_messages_to_send === 0 ||
                 typeof pdu.more_messages_to_send === 'undefined')) {
-            try {
-                console.log("trying response: " + resObj.mtText);
-                resObj.socket.emit('MT SMS', { mtText: resObj.mtText });
-                resObj.mtText = '';
-
-            } catch (err) {
-                console.log("oops no session:" + err);
+            for (i = 0; i < foundClients.length; i++) {
+                try {
+                    console.log("trying response: " + foundClients[i].mtText);
+                    foundClients[i].socket.emit('MT SMS', { mtText: foundClients[i].mtText });
+                    foundClients[i].mtText = '';
+                } catch (err) {
+                    console.log("oops no session:" + err);
+                }
             }
         }
 
@@ -281,4 +282,3 @@ server.listen(theport);
 //io.listen(http);
 
 module.exports = app;
-
