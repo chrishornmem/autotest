@@ -137,12 +137,13 @@
 
 .img-container .msisdn-header {
     position: absolute;
-    top: 0;
+    top: 12%;
     background-color: LightGrey;
     color: black;
     font-size: 9pt; 
     height: 15px;
-    width: 100%;
+    width: 69%;
+    left:16%;
 }
 
 .img-container .sms-response {

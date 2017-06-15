@@ -16,10 +16,10 @@
                 <div class="visible-xs img-responsive">
                     <img ng-src="{{'/images/blank.png'}}" alt="" />
                 </div>
+                <div class="msisdn-header">
+                    Your Virtual Mobile No: {{msisdn}}
+                </div>
                 <div class="sms-response">
-                    <div class="msisdn-header">
-                        Your Virtual Mobile No: {{msisdn}}
-                    </div>
                     <div scroll-bottom="results" class="sms-response-pos">
                         <div ng-repeat="obj in results track by $index">
                             <div ng-if="obj.type == 'mt'" class="sms-mt">
