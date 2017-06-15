@@ -133,7 +133,7 @@ var smppServer = smpp.createServer(function(session) {
         console.log("more messages:" + pdu.more_messages_to_send);
 
         // retrieve the session information based on the msisdn
-        for (i = 0; i < clients.length; i++) {
+        for (var i = 0; i < clients.length; i++) {
             if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.msisdn === pdu.destination_addr) {
                 clients[i].moRecord.messageWaiting = true;
                 clients[i].moRecord.mtText = clients[i].moRecord.mtText + mtText;
@@ -154,12 +154,12 @@ var smppServer = smpp.createServer(function(session) {
         //   4) send the result back to the client using the saved session
         if (clientFound && (pdu.more_messages_to_send === 0 ||
                 typeof pdu.more_messages_to_send === 'undefined')) {
-            for (i = 0; i < clients[i].length; i++) {
+            for (var i = 0; i < clients[i].length; i++) {
                 try {
-                    console.log("trying response: " + foundClients[i].mtText);
+                    console.log("trying response: " + clients[i].moRecord.mtText);
                     clients[i].moRecord.messageWaiting = false;
                     clients[i].moRecord.mtText = '';
-                    clients[i].moRecord.socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
+                    clients[i].socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
                 } catch (err) {
                     console.log("oops no session:" + err);
                 }
