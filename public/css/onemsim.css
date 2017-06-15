@@ -135,9 +135,19 @@
     width: 67%;
 }
 
+.img-container .msisdn-header {
+    position: absolute;
+    top: 0;
+    background-color: LightGrey;
+    color: black;
+    font-size: 9pt; 
+    height: 15px;
+    width: 100%;
+}
+
 .img-container .sms-response {
     position: absolute;
-    top: 13%;
+    top: 12%;
     min-height: 65%;
     height: 75%;
     left: 16%;
@@ -152,6 +162,8 @@
 }
 
 .img-container .sms-response-pos .sms-placeholder {
+    position: absolute;
+    top: 2%;
     width: 100%;
     height: auto;
     display: inline-block;
