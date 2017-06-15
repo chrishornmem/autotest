@@ -157,7 +157,7 @@ var smppServer = smpp.createServer(function(session) {
                 typeof pdu.more_messages_to_send === 'undefined')) {
             console.log("clientfound and no more messages");
             console.log("clients.length:" + clients.length);
-            for (i = 0; i < clients[i].length; i++) {
+            for (i = 0; i < clients.length; i++) {
                 if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.messageWaiting) {
                     try {
                         console.log("trying response: " + clients[i].moRecord.mtText);
