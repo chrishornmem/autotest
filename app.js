@@ -137,7 +137,7 @@ var smppServer = smpp.createServer(function(session) {
         for (i = 0; i < clients.length; i++) {
             if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.msisdn === pdu.destination_addr) {
                 resultObject = clients[i].moRecord;
-                resultObject.mtText = resObj.mtText + mtText;
+                resultObject.mtText = resultObject.mtText + mtText;
                 foundClients.push(resultObject);
             }
         }
