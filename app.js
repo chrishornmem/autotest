@@ -154,14 +154,16 @@ var smppServer = smpp.createServer(function(session) {
         //   4) send the result back to the client using the saved session
         if (clientFound && (pdu.more_messages_to_send === 0 ||
                 typeof pdu.more_messages_to_send === 'undefined')) {
-            for (var i = 0; i < clients[i].length; i++) {
-                try {
-                    console.log("trying response: " + clients[i].moRecord.mtText);
-                    clients[i].moRecord.messageWaiting = false;
-                    clients[i].moRecord.mtText = '';
-                    clients[i].socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
-                } catch (err) {
-                    console.log("oops no session:" + err);
+            for (i = 0; i < clients[i].length; i++) {
+                if (clients[i].moRecord.messageWaiting) {
+                    try {
+                        console.log("trying response: " + clients[i].moRecord.mtText);
+                        clients[i].moRecord.messageWaiting = false;
+                        clients[i].moRecord.mtText = '';
+                        clients[i].socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
+                    } catch (err) {
+                        console.log("oops no session:" + err);
+                    }
                 }
             }
         }
