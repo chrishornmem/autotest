@@ -159,8 +159,8 @@ var smppServer = smpp.createServer(function(session) {
                     try {
                         console.log("trying response: " + clients[i].moRecord.mtText);
                         clients[i].moRecord.messageWaiting = false;
+                        clients[i].moRecord.socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
                         clients[i].moRecord.mtText = '';
-                        clients[i].socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
                     } catch (err) {
                         console.log("oops no session:" + err);
                     }
