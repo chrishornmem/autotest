@@ -67,12 +67,6 @@ ONEmSimModule.directive('setWidth', function() {
         restrict: 'AE',
         link: function(scope, element, attrs) {
 
-
-            var phone = angular.element(document.getElementById('phone'));
-
-            console.log("current width:");
-            console.log(element.outerWidth());
-
             var width;
             setTimeout(function() {
                 width = angular.element('#phone').prop('clientWidth');
@@ -80,7 +74,7 @@ ONEmSimModule.directive('setWidth', function() {
                 console.log(width);
 
                 element.outerWidth(width);
-            }, 50);
+            }, 150);
 
         }
     };
