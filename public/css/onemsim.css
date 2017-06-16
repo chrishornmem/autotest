@@ -48,7 +48,6 @@
 }
 
 .msisdn-header {
-
     position:absolute;
     text-align:center;
     top: 13%;
@@ -57,11 +56,22 @@
     line-height: 75%;
 }
 
+.msisdn-header-mob {
+    float:right;
+}
+
 .sms-input {
     position:absolute;
     left: 40%;
     right: 40%;
     bottom: 13%;
+}
+
+.sms-input-mob {
+    position:absolute;
+    left: 2%;
+    right: 2%;
+    bottom: 5%;
 }
 
 .img-container .sms-window-desktop {
@@ -98,12 +108,12 @@
     height: 100vh;
 }
 
-.sms-response-pos {
+.sms-response-pos-mob {
     position: absolute;
-    top: 15%;
+    top: 5%;
     margin-right: 20px;
     width: 100%;
-    height: 65%;
+    height: 82%;
     display: block;
     overflow: auto;
 }
@@ -114,6 +124,14 @@
     display: inline-block;
     padding: 4px 4px 4px 4px;
     width: 88%;
+}
+
+.sms-placeholder-mob {  
+    max-width: 700px;
+    height: auto;
+    display: inline-block;
+    padding: 4px 4px 4px 4px;
+    width: 100%;
 }
 
 .sms-mt-container {

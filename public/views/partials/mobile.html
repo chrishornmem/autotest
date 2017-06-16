@@ -3,7 +3,7 @@
         Your Virtual Mobile No: {{msisdn}}
     </div>
     <div class="sms-response-mob">
-        <div scroll-bottom="results" class="sms-response-pos">
+        <div scroll-bottom="results" class="sms-response-pos-mob">
             <div ng-repeat="obj in results track by $index">
                 <div ng-if="obj.type == 'mt'" class="sms-mt">
                     <div class="sms-placeholder">
@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 <div ng-if="obj.type == 'mo'" class="sms-mo">
-                    <div class="sms-placeholder">
+                    <div class="sms-placeholder-mob">
                         <div class="sms-mo-container">
                             <span>{{obj.value}}</span>
                         </div>
@@ -25,7 +25,7 @@
             </div>
         </div>
     </div>
-    <div ng-controller="inputController" class="sms-input">
+    <div ng-controller="inputController" class="sms-input-mob">
         <form ng-submit="smsInput()">
             <label for="sms"></label>
             <input ng-model="smsText" type="text" placeholder="iMessage" class="form-control" id="sms" autocomplete="off">
