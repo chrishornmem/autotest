@@ -62,23 +62,39 @@ ONEmSimModule.config(['$httpProvider',
     }
 ]);
 
-ONEmSimModule.directive('setWidth', function() {
+ONEmSimModule.directive('setWidth', ['$window', function($window) {
+
     return {
         restrict: 'AE',
         link: function(scope, element, attrs) {
 
             var width;
             setTimeout(function() {
-                width = angular.element('#phone').prop('clientWidth');
+                width = angular.element('#phone').prop('clientWidth') * .85;
                 console.log("phoneWidth:");
                 console.log(width);
 
-                element.outerWidth(width);
+                element.width(width);
             }, 150);
+
+            angular.element($window).bind('resize', function() {
+                var width;
+                setTimeout(function() {
+                    width = angular.element('#phone').prop('clientWidth') * .85;
+                    console.log("phoneWidth:");
+                    console.log(width);
+
+                    element.width(width);
+                }, 150);
+
+                // manual $digest required as resize event
+                // is outside of angular
+                scope.$digest();
+            });
 
         }
     };
-});
+}]);
 
 ONEmSimModule.factory('Socket', function(socketFactory) {
     var mySocket = socketFactory();
