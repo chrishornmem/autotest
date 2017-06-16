@@ -96,7 +96,7 @@
 }
 
 .img-container .sms-response-pos .sms-placeholder {
-    width: 87%;
+    width: 90%;
     max-width: 700px; 
     height: auto;
     display: inline-block;
@@ -126,7 +126,6 @@
 
 .img-container .sms-response-pos .sms-mo-container {
     position: relative;
-
     height: auto;
     display: block;
     border-radius: 15px;
