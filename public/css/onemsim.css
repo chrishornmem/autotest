@@ -67,8 +67,8 @@
 .img-container .sms-window-desktop {
     position: absolute;
     bottom: 19%;
-    left: 41%;
-    right: 41%;
+    left: 40%;
+    right: 40%;
     overflow: auto;
     height: 66%;
 }
