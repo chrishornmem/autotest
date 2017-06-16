@@ -59,15 +59,16 @@
 
 .sms-input {
     position:absolute;
-    left: 41%;
-    right: 41%;
+    left: 40%;
+    right: 40%;
     bottom: 13%;
 }
 
 .img-container .sms-window-desktop {
     position: absolute;
     bottom: 19%;
-    left: 41%;
+    left: 35%;
+    right: 41%;
     overflow: auto;
     height: 66%;
 }
@@ -107,12 +108,12 @@
     overflow: auto;
 }
 
-.sms-placeholder {
-    width: 87%;
+.sms-placeholder {  
     max-width: 700px;
     height: auto;
     display: inline-block;
-    padding: 4px 0px 4px 4px;
+    padding: 4px 4px 4px 4px;
+    width: 87%;
 }
 
 .sms-mt-container {
