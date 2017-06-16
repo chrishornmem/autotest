@@ -75,7 +75,7 @@ ONEmSimModule.directive('setWidth', function() {
 
             var width;
             setTimeout(function() {
-                width = angular.element(document.getElementById('phone')).prop('offsetWidth');
+                width = angular.element('#phone').prop('clientWidth');
                 console.log("phoneWidth:");
                 console.log(width);
 
