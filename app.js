@@ -191,22 +191,24 @@ function sendSMS(from, to, text) {
         buffer.writeUInt16BE(text.charCodeAt(i), 2 * i);
     }
 
-    smppSession.deliver_sm({
-        source_addr: from,
-        source_addr_ton: 1,
-        source_addr_npi: 0,
-        destination_addr: to,
-        destination_addr_ton: 1,
-        destination_addr_npi: 0,
-        data_coding: 8,
-        short_message: buffer
-    }, function(pdu) {
-        //    console.log('sms pdu status', lookupPDUStatusKey(pdu.command_status));
-        if (pdu.command_status === 0) {
-            // Message successfully sent
-            console.log("message sent:");
-        }
-    });
+    if (smppSession) {
+        smppSession.deliver_sm({
+            source_addr: from,
+            source_addr_ton: 1,
+            source_addr_npi: 0,
+            destination_addr: to,
+            destination_addr_ton: 1,
+            destination_addr_npi: 0,
+            data_coding: 8,
+            short_message: buffer
+        }, function(pdu) {
+            //    console.log('sms pdu status', lookupPDUStatusKey(pdu.command_status));
+            if (pdu.command_status === 0) {
+                // Message successfully sent
+                console.log("message sent:");
+            }
+        });
+    }
 }
 
 io.on('connection', function(socket) {

@@ -1,30 +1,3 @@
-#context-menu {
-    position: absolute;
-    left: 150px !important;
-}
-
-.panel > .panel-heading {
-    background-image: none;
-    background-color: black;
-    color: white;
-    font-size: 16px;
-}
-
-.breadcrumb {
-    margin-top: 10px;
-}
-
-.comment {
-    margin-top: 20px;
-}
-
-.comment-text {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-}
-
 .onem-border {
     margin-top: 10px;
 }
@@ -33,77 +6,17 @@
     margin-top: 25px;
     /* float: right;*/
 }
+
 .onem-label {
     display: inline-block;
     margin-left: 10px;
     margin-top: 10px;
 }
+
 .onem-controls {
     display: inline-block;
     margin-top: 10px;
     margin-left: 30px;
-}
-
-.tab-log-container {
-    overflow: auto;
-    height: 65vh;
-}
-
-.tab-log-text {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-}
-
-.tab-help-container {
-    overflow: auto;
-    height: 65vh;
-}
-
-.tab-help-table {
-    font-size: 10px;
-}
-
-.tab-help-container p {
-    text-align: justify;
-    margin-left: 10px;
-    margin-right: 20px;
-}
-
-.tab-help-navigator {
-    overflow: auto;
-    border-right: solid;
-    border-right-width: 1px;
-    border-right-color: LightGrey;
-   /*  background-color: #e0e0e0;*/
-    height: 100%;
-    max-height: 100%;
-}
-
-.tab-help-level-1 {
-    font-weight: bold;
-}
-
-.tab-help-level-2 {
-    text-indent: 10px;
-}
-
-.tab-help-text {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    -webkit-box-decoration-break: clone;
-    box-decoration-break: clone;
-}
-
-.comments-container {
-    overflow: auto;
-    height: 70vh;
-}
-
-.filemanager-container {
-    overflow: auto;
-    height: 70vh;
 }
 
 .onem-logo img {
@@ -121,29 +34,25 @@
     display: inline-block;
 }
 
+.img-container  {
+    margin: 0 auto;
+    position: relative;
+}
+
 .img-container img {
-    width: 90%;
-    height: auto;
+    height: 85vh;
     margin: 0 auto;
     display: block;
 }
 
-.img-container .sms-input {
-    position: absolute;
-    top: 78%;
-    left: 17%;
-    width: 67%;
+.sms-response-desktop {
+    margin: auto;
 }
 
-.img-container .msisdn-header {
+.msisdn-header {
     position: absolute;
     top: 12%;
-    background-color: LightGrey;
-    color: black;
-    font-size: 9pt; 
-    height: 15px;
-    width: 69%;
-    left:16%;
+    margin-left: 30px;
 }
 
 .img-container .sms-response {
@@ -155,7 +64,31 @@
     width: 69%;
 }
 
-.img-container .sms-response-pos {
+.img-container .sms-response-desktop {
+    color: black;
+    font-size: 9pt;
+    margin-top: 5px;
+}
+
+.img-container .desktop-header {
+    margin-top: 10px;
+}
+
+
+.sms-input {
+    position: absolute;
+    bottom: 0;
+    margin: 0 auto;
+}
+
+.sms-response-mob {
+    height: 100vh;
+}
+
+.sms-response-pos {
+    position: absolute;
+    top: 15%;
+    margin-right: 20px;
     width: 100%;
     height: 89%;
     display: block;
@@ -163,7 +96,8 @@
 }
 
 .img-container .sms-response-pos .sms-placeholder {
-    width: 100%;
+    width: 87%;
+    max-width: 700px; 
     height: auto;
     display: inline-block;
     padding: 4px;
@@ -192,7 +126,7 @@
 
 .img-container .sms-response-pos .sms-mo-container {
     position: relative;
-    max-width: 79%;
+
     height: auto;
     display: block;
     border-radius: 15px;

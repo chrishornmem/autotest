@@ -1,0 +1,37 @@
+
+    <div class="img-container ">
+        <img ckass="img-responsive" id="phone" ng-src="{{'/images/iPhone-header.png'}}" alt="" />
+        <div set-width class="sms-response-desktop text-center">
+            <div class="msisdn-header text-center">
+                Virtual Mobile No: {{msisdn}}
+            </div>
+            <div set-width scroll-bottom="results" class="sms-response-pos">
+                <div ng-repeat="obj in results track by $index">
+                    <div ng-if="obj.type == 'mt'" class="sms-mt">
+                        <div class="sms-placeholder">
+                            <div class="sms-mt-container">
+                                <span>{{obj.value}}</span>
+                            </div>
+                            <div ng-if="smsLength" class="sms-length">
+                                <span>{{obj.value.length}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-if="obj.type == 'mo'" class="sms-mo">
+                        <div class="sms-placeholder">
+                            <div class="sms-mo-container">
+                                <span>{{obj.value}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-controller="inputController" class="sms-input">
+                <form ng-submit="smsInput()">
+                    <label for="sms"></label>
+                    <input ng-model="smsText" type="text" placeholder="iMessage" class="form-control" id="sms" autocomplete="off">
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- <input id="CallButton" type="button" value="Idle"></input> -->
