@@ -43,6 +43,10 @@
     position: relative;
 }
 
+.img-container-mob {
+    position: relative;
+}
+
 .img-container img {
     height: 85vh;
     display: block;
@@ -62,7 +66,7 @@
 }
 
 .msisdn-header-mob {
-    float: right;
+    background-color: LightGrey;
 }
 
 .sms-input {
