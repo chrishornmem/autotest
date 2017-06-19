@@ -1,3 +1,7 @@
+body {
+    line-height: 100%;
+}
+
 .onem-border {
     margin-top: 10px;
 }
@@ -157,8 +161,6 @@
     padding-left: 10px;
     padding-right: 10px;
     background-color: #e0e0e0;
-    font-size: 13.5px;
-    line-height: 18px;
     vertical-align: top;
 }
 
@@ -178,8 +180,6 @@
     padding-right: 10px;
     background-color: blue;
     color: white;
-    font-size: 13.5px;
-    line-height: 18px;
 }
 
 .sms-mt-container .sms-mt {
@@ -199,7 +199,6 @@
     box-decoration-break: clone;
     word-wrap: break-word;
     font-size: 80%;
-    line-height: 80%;
 }
 
 .sms-mo span {
@@ -209,5 +208,4 @@
     -webkit-box-decoration-break: clone;
     box-decoration-break: clone;
     font-size: 80%;
-    line-height: 80%;
 }
