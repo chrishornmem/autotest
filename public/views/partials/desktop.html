@@ -1,10 +1,9 @@
 <div row>
     <div class="img-container">
-        <img class="img-responsive center-block" id="phone" ng-src="{{'/images/iPhone-header.png'}}" alt="" />
         <div class="msisdn-header text-center">
             Virtual Mobile No: {{msisdn}}
         </div>
-        <div set-width class="sms-window-desktop" scroll-bottom="results">
+        <div class="center-block sms-window-desktop" scroll-bottom="results">
             <div ng-repeat="obj in results track by $index">
                 <div ng-if="obj.type == 'mt'" class="sms-mt">
                     <div class="sms-placeholder">
