@@ -3,10 +3,10 @@
         <div class="msisdn-header text-center">
             Virtual Mobile No: {{msisdn}}
         </div>
-        <div class="center-block sms-window-desktop" scroll-bottom="results">
+        <div class="sms-window-desktop" scroll-bottom="results">
             <div ng-repeat="obj in results track by $index">
                 <div ng-if="obj.type == 'mt'" class="sms-mt">
-                    <div class="sms-placeholder">
+                    <div class="sms-placeholder-mt">
                         <div class="sms-mt-container">
                             <span>{{obj.value}}</span>
                         </div>
@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 <div ng-if="obj.type == 'mo'" class="sms-mo">
-                    <div class="sms-placeholder">
+                    <div class="sms-placeholder-mo">
                         <div class="sms-mo-container">
                             <span>{{obj.value}}</span>
                         </div>

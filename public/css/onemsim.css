@@ -92,8 +92,8 @@ body {
 .sms-window-desktop {
     position: absolute;
     top: 15%;
-    left: 41%;
-    right: 40%;
+    left: 40%;
+    right: 39%;
     overflow: auto;
     height: 66%;
 }
@@ -140,6 +140,24 @@ body {
     padding: 4px 4px 4px 12px;
     width: 98%;
 }
+
+.sms-placeholder-mo {
+    max-width: 700px;
+    height: auto;
+    display: inline-block;
+    padding: 4px 4px 4px 4px;
+    width: 80%;
+    float: right;
+}
+
+.sms-placeholder-mt {
+    max-width: 700px;
+    height: auto;
+    display: inline-block;
+    padding: 4px 4px 4px 4px;
+    width: 80%;
+}
+
 
 .sms-placeholder-mob {
     max-width: 700px;
