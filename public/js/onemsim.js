@@ -70,21 +70,23 @@ ONEmSimModule.directive('setWidth', ['$window', function($window) {
 
             var width;
             setTimeout(function() {
-                width = angular.element('#phone').prop('clientWidth') * .85;
+                width = angular.element('#phone').prop('clientWidth');
+                var ratio = 22 * (width / 726);
                 console.log("phoneWidth:");
-                console.log(width);
+                console.log(width - ratio);
 
-                element.width(width);
+                element.width(width - ratio);
             }, 150);
 
             angular.element($window).bind('resize', function() {
                 var width;
                 setTimeout(function() {
-                    width = angular.element('#phone').prop('clientWidth') * .85;
+                    width = angular.element('#phone').prop('clientWidth');
+                    var ratio = 22 * (width / 726);
                     console.log("phoneWidth:");
-                    console.log(width);
+                    console.log(width - ratio);
 
-                    element.width(width);
+                    element.width(width - ratio);
                 }, 150);
 
                 // manual $digest required as resize event
