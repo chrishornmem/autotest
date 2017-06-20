@@ -98,6 +98,18 @@ ONEmSimModule.directive('setWidth', ['$window', function($window) {
     };
 }]);
 
+// this directive automatically closes the keyboard on the mobile after submitting a form
+ONEmSimModule.directive('handlePhoneSubmit',
+    function() {
+        return function(scope, element, attr) {
+            var textFields = element.find('input');
+            element.bind('submit', function() {
+                console.log('form was submitted');
+                textFields[0].blur();
+            });
+        };
+    });
+
 ONEmSimModule.factory('Socket', function(socketFactory) {
     var mySocket = socketFactory();
     mySocket.forward('error');

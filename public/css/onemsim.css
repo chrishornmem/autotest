@@ -49,6 +49,9 @@ body {
 
 .img-container-mob {
     position: relative;
+    padding-top: 10px;
+    height: 95vh;
+    width: 95vw;
 }
 
 .img-container img {

@@ -26,7 +26,7 @@
         </div>
     </div>
     <div ng-controller="inputController" class="sms-input-mob">
-        <form ng-submit="smsInput()">
+        <form handle-form-submit ng-submit="smsInput()">
             <label for="sms"></label>
             <input ng-model="smsText" type="text" placeholder="iMessage" class="form-control" id="sms" autocomplete="off">
         </form>
