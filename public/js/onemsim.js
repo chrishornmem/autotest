@@ -106,9 +106,12 @@ ONEmSimModule.directive('handlePhoneSubmit',
             element.bind('submit', function() {
                 console.log('form was submitted');
                 textFields[0].blur();
+                $('html, body').animate({ scrollTop: 0 }, 150);
+
             });
         };
-    });
+    }
+);
 
 ONEmSimModule.factory('Socket', function(socketFactory) {
     var mySocket = socketFactory();
@@ -151,6 +154,17 @@ ONEmSimModule.directive('scrollBottom', function() {
                     var scrollHeight = $(element)[0].scrollHeight;
                     $(element).animate({ scrollTop: scrollHeight }, 300);
                 }
+            });
+        }
+    };
+});
+
+ONEmSimModule.directive("scrollAfterSubmit", function() {
+    return {
+        link: function(scope, element, attr) {
+            var $id = $("#" + attr.scrollBottom);
+            $(element).on("submit", function() {
+                $id.scrollTop($id[0].scrollHeight);
             });
         }
     };

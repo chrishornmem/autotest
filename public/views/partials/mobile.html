@@ -2,34 +2,36 @@
     <div class="msisdn-header-mob text-center">
         Your Virtual Mobile No: {{msisdn}}
     </div>
-    <div class="sms-response-mob">
-        <div scroll-bottom="results" class="sms-response-pos-mob">
-            <div ng-repeat="obj in results track by $index">
-                <div ng-if="obj.type == 'mt'" class="sms-mt">
-                    <div class="sms-placeholder">
-                        <div class="sms-mt-container">
-                            <span>{{obj.value}}</span>
-                        </div>
-                        <div ng-if="smsLength" class="sms-length">
-                            <span>{{obj.value.length}}</span>
-                        </div>
+    <div scroll-bottom="results" class="sms-response-pos-mob">
+        <div id="results" ng-repeat="obj in results track by $index">
+            <div ng-if="obj.type == 'mt'" class="sms-mt">
+                <div class="sms-placeholder-mob">
+                    <div class="sms-mt-container">
+                        <span>{{obj.value}}</span>
+                    </div>
+                    <div ng-if="smsLength" class="sms-length">
+                        <span>{{obj.value.length}}</span>
                     </div>
                 </div>
-                <div ng-if="obj.type == 'mo'" class="sms-mo">
-                    <div class="sms-placeholder-mob">
-                        <div class="sms-mo-container">
-                            <span>{{obj.value}}</span>
-                        </div>
+            </div>
+            <div ng-if="obj.type == 'mo'" class="sms-mo">
+                <div class="sms-placeholder-mob">
+                    <div class="sms-mo-container">
+                        <span>{{obj.value}}</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div ng-controller="inputController" class="sms-input-mob">
-        <form handle-form-submit ng-submit="smsInput()">
-            <label for="sms"></label>
-            <input ng-model="smsText" type="text" placeholder="iMessage" class="form-control" id="sms" autocomplete="off">
-        </form>
+    <div ng-controller="inputController">
+        <nav class="navbar navbar-default navbar-static-bottom">
+            <div class="container">
+                <form handle-phone-submit ng-submit="smsInput()" class="sms-input-mob">
+                    <label for="sms"></label>
+                    <input autofocus ng-model="smsText" type="text" placeholder="iMessage" class="form-control" id="sms" autocomplete="off">
+                </form>
+            </div>
+        </nav>
     </div>
     <!-- <input id="CallButton" type="button" value="Idle"></input> -->
 </div>
