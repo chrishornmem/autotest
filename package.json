@@ -23,7 +23,6 @@
     "fs-extra": "^1.0.0",
     "glob": "^7.1.1",
     "jade": "*",
-    "jssip": "^3.0.12",
     "jwt-simple": ">=0.5.0",
     "method-override": "2.1.2",
     "moment": "^2.17.1",
@@ -32,6 +31,7 @@
     "request": "^2.74.0",
     "serve-favicon": "*",
     "session-file-store": "^1.0.0",
+    "sip.js": "^0.7.8",
     "smpp": "^0.3.1",
     "socket.io": "^2.0.3",
     "underscore": "^1.8.3",
@@ -60,4 +60,3 @@
     "protractor": "^4.0.9"
   }
 }
-

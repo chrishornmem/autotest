@@ -1,5 +1,4 @@
 var express = require('express');
-//var app = require('express')();
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
@@ -16,15 +15,11 @@ var moment = require('moment');
 var _ = require('underscore-node');
 var smpp = require('smpp');
 var FileStore = require('session-file-store')(session);
-// var sharedsession = require("express-socket.io-session");
 
 require('dotenv').load();
 
 // Bring in the routes for the API (delete the default routes)
 var routesApi = require('./app_api/routes/index.js');
-
-// Bring in the data model & connect to db
-// require('./app_api/models/db');
 
 // The http server will listen to an appropriate port, or default to
 // port 5000.
@@ -49,8 +44,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// JsSIP is not designed to use "express" library. To be loaded we need its path:
-app.use(express.static(path.join(__dirname, 'node_modules/jssip/dist')));
+// SIP.js is not designed to use "express" library. To be loaded we need its path:
+app.use(express.static(path.join(__dirname, 'node_modules/sip.js/dist')));
 
 var express_middleware = session({
     secret: 'aut0test',
@@ -90,8 +85,7 @@ var smppServer = smpp.createServer(function(session) {
         // we pause the session to prevent further incoming pdu events,
         // untill we authorize the session with some async operation.
         session.pause();
-        //     checkAsyncUserPass(pdu.system_id, pdu.password, function(err) {
-        //         if (err) {
+
         if (!(pdu.system_id == smppSystemId && pdu.password == smppPassword)) {
             session.send(pdu.response({
                 command_status: smpp.ESME_RBINDFAIL
@@ -224,10 +218,10 @@ function sendSMS(from, to, text) {
             messagePartsNumber = Math.floor(textLength/70);
             if(messagePartsNumber * 70 != textLength) messagePartsNumber++;
 
-            udh.writeUInt8(0x05,0); //Length of the UDF
-            udh.writeUInt8(0x00,1); //Indicator for concatenated message
-            udh.writeUInt8(0x03,2); //  Subheader Length ( 3 bytes)
-            udh.writeUInt8(referenceCSMS,3); //Same reference for all concatenated messages  
+            udh.writeUInt8(0x05,0);               //Length of the UDF
+            udh.writeUInt8(0x00,1);               //Indicator for concatenated message
+            udh.writeUInt8(0x03,2);               //Subheader Length ( 3 bytes)
+            udh.writeUInt8(referenceCSMS,3);      //Same reference for all concatenated messages  
             udh.writeUInt8(messagePartsNumber,4); //Number of total messages in the concatenation
 
             while (textLength > 0) {
@@ -278,7 +272,7 @@ io.on('connection', function(socket) {
 
     socket.emit(socket.handshake.session);
 
-    if (!socket.handshake.session.onemContext) { // must be first time, or expired
+    if (!socket.handshake.session.onemContext) { //must be first time, or expired
         var msisdn = moment().format('YYMMDDHHMMSS');
         console.log("msisdn:" + msisdn);
         socket.handshake.session.onemContext = { msisdn   : msisdn};
@@ -315,7 +309,7 @@ io.on('connection', function(socket) {
 app.get('/api/start', function(req, res, next) {
 
   // if first time (no session) then generate a virtual MSISDN using current timestamp, which is saved in session cookie
-  if (!req.session.onemContext) { // must be first time, or expired
+  if (!req.session.onemContext) { //must be first time, or expired
     var msisdn = moment().format('YYMMDDHHMMSS');
     console.log("msisdn:" + msisdn);
 
@@ -365,7 +359,6 @@ if ('development' == app.get('env')) {
 
 smppServer.listen(smppPort);
 server.listen(theport);
-//io.listen(http);
 
 module.exports = app;
 
