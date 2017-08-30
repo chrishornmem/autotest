@@ -353,6 +353,7 @@ ONEmSimModule.controller('mainController', [
             'session_timers'         : true,
             'useUpdate'              : false,
             'use_preloaded_route'    : false,
+            'extraHeaders'           : [ 'X-WEBRTC-UA: sweb' ],
             'pcConfig'               : {
                 'rtcpMuxPolicy'      : 'negotiate',
                 'iceServers'         : // [ {
@@ -397,6 +398,10 @@ ONEmSimModule.controller('mainController', [
             };
 
             var phoneONEm = new JsSIP.UA(configuration);
+
+            phoneONEm.registrator().setExtraHeaders([
+                'X-WEBRTC-UA: sweb'
+            ]);
 
             $('a.full').click(function(e){
                 e.preventDefault();

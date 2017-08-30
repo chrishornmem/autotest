@@ -27,13 +27,13 @@ var routesApi = require('./app_api/routes/index.js');
 // require('./app_api/models/db');
 
 // The http server will listen to an appropriate port, or default to
-// port 5000.
-var theport = process.env.PORT || 5000;
+// port 6000.
+var theport = process.env.PORT || 6000;
 var username = process.env.USERNAME; // used for web basic auth
 var password = process.env.PASSWORD; // used for web basic auth
 var smppSystemId = process.env.SMPP_SYSTEMID || "autotest";
 var smppPassword = process.env.SMPP_PASSWORD || "password";
-var smppPort = process.env.SMPP_PORT || 2775;
+var smppPort = process.env.SMPP_PORT || 3775;
 var sipProxy = process.env.SIP_PROXY || "zoiper.dhq.onem";
 var wsProtocol = process.env.WS_PROTOCOL || "ws";
 
