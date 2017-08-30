@@ -769,6 +769,13 @@ ONEmSimModule.controller('mainController', [
                     isInCall = 1;
                 });
 
+                // End the call or reject the call:
+                RejectButton.click( function(){
+                    console.log('RejectButton - click');
+                    //phoneONEm.terminateSessions();
+                    globalSession.terminate();
+                });
+
                 //// End call in 30 seconds:
                 //setTimeout(IncomingEndCall, 30000);
             });
@@ -807,14 +814,6 @@ ONEmSimModule.controller('mainController', [
 
             // For debug run this in the browser's console and reload the page:
             // JsSIP.debug.enable('JsSIP:*');
-
-
-            // End the call or reject the call:
-            RejectButton.click( function(){
-                console.log('RejectButton - click');
-                //phoneONEm.terminateSessions();
-                globalSession.terminate();
-            });
 
             //Make a phone call:
             CallButton.click( function(){
