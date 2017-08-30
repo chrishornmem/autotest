@@ -360,6 +360,7 @@ ONEmSimModule.controller('mainController', [
             sessionTimersExpires   : 600,
             session_timers         : true,
             useUpdate              : false,
+            extraHeaders           : [ 'X-WEBRTC-UA: zoiper' ],
             use_preloaded_route    : false,
             pcConfig               : {
                 rtcpMuxPolicy      : 'negotiate',
@@ -404,13 +405,18 @@ ONEmSimModule.controller('mainController', [
                 authorizationUser : $scope.msisdn,
                 noAnswerTimeout   : 120,
                 password          : 'ONEmP@$$w0rd2016',
-                register          : true,
+                register          : false,
                 registerExpires   : 120,
                 stunServers       : [ 'stun:stun.l.google.com:19302' ],
+                extraHeaders      : [ 'X-WEBRTC-UA: zoiper' ],
                 usePreloadedRoute : false
             };
 
-            var phoneONEm = new SIP.UA(configuration);
+            var phoneONEm = new SIP.UA(configuration).register({ extraHeaders: ['X-WEBRTC-UA: zoiper']});
+
+            //phoneONEm.registrator.setExtraHeaders([
+            //    'X-WEBRTC-UA: zoiper'
+            //]);
 
             var target = null;
 
