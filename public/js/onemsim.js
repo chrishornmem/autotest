@@ -161,141 +161,6 @@ ONEmSimModule.controller('mainController', [
 
         console.log("mainController initialising");
 
-        var isInCall = 0;
-
-        var URL = window.URL || window.webkitURL;
-
-        //These are the variables needed for the code found at https://chromium.googlesource.com/chromium/src.git/+/lkgr/chrome/test/data/webrtc/adapter.js?autodive=0%2F
-        var RTCPeerConnection = null;
-        var getUserMedia = null;
-        var attachMediaStream = null;
-        var reattachMediaStream = null;
-        var webrtcDetectedBrowser = null;
-        var webrtcDetectedVersion = null;
-
-        //function trace(text) {
-        //    // This function is used for logging.
-        //    if (text[text.length - 1] == '\n') {
-        //        text = text.substring(0, text.length - 1);
-        //    };
-        //    console.log((performance.now() / 1000).toFixed(3) + ": " + text);
-        //};
-
-        if (navigator.mozGetUserMedia) {
-            console.log("This appears to be Firefox");
-            webrtcDetectedBrowser = "firefox";
-            webrtcDetectedVersion = parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1]);
-            // The RTCPeerConnection object.
-            RTCPeerConnection = mozRTCPeerConnection;
-            // The RTCSessionDescription object.
-            RTCSessionDescription = mozRTCSessionDescription;
-            // Get UserMedia (only difference is the prefix).
-            // Code from Adam Barth.
-            getUserMedia = navigator.mozGetUserMedia.bind(navigator);
-            // Attach a media stream to an element.
-            attachMediaStream = function(element, stream) {
-                console.log("Attaching media stream");
-                element.mozSrcObject = stream;
-                element.play();
-            };
-            reattachMediaStream = function(to, from) {
-                console.log("Reattaching media stream");
-                to.mozSrcObject = from.mozSrcObject;
-                to.play();
-            };
-        } else if (navigator.webkitGetUserMedia) {
-            console.log("This appears to be Chrome");
-            webrtcDetectedBrowser = "chrome";
-            webrtcDetectedVersion = parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]);
-            // The RTCPeerConnection object.
-            RTCPeerConnection = webkitRTCPeerConnection;
-            // Get UserMedia (only difference is the prefix).
-            // Code from Adam Barth.
-            getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
-            // Attach a media stream to an element.
-            attachMediaStream = function(element, stream) {
-                console.log("Attaching media stream");
-                if (typeof element.srcObject !== 'undefined') {
-                    element.srcObject = stream;
-                } else if (typeof element.mozSrcObject !== 'undefined') {
-                    element.mozSrcObject = stream;
-                } else if (typeof element.src !== 'undefined') {
-                    element.src = URL.createObjectURL(stream);
-                } else {
-                    console.log('Error attaching stream to element.');
-                };
-            };
-            reattachMediaStream = function(to, from) {
-                console.log("Reattaching media stream");
-                to.src = from.src;
-            };
-            // The representation of tracks in a stream is changed in M26.
-            // Unify them for earlier Chrome versions in the coexisting period.
-            if (!webkitMediaStream.prototype.getVideoTracks) {
-                webkitMediaStream.prototype.getVideoTracks = function() {
-                    return this.videoTracks;
-                };
-                webkitMediaStream.prototype.getAudioTracks = function() {
-                    return this.audioTracks;
-                };
-            };
-            // New syntax of getXXXStreams method in M26.
-            if (!webkitRTCPeerConnection.prototype.getLocalStreams) {
-                webkitRTCPeerConnection.prototype.getLocalStreams = function() {
-                    return this.localStreams;
-                };
-                webkitRTCPeerConnection.prototype.getRemoteStreams = function() {
-                    return this.remoteStreams;
-                };
-            }
-        } else {
-            console.log("Browser does not appear to be WebRTC-capable");
-        };
-
-        //These are the buttons of the phone's user interface:
-        var AnswerButton = $('.call_tools a.answer');
-        var RejectButton = $('.call_tools a.cancel');
-        var CallButton = $('.screen a.call');
-        var ClosePanelButton = $('.screen a.closer');
-        var TalkTimer = $('.answer .talktime');
-
-        //var audioElement = document.getElementById('myAudio');
-        var audioElement = $('#myAudio')[0];
-        audioElement.autoplay = true;
-        console.log(audioElement);
-        //var videoElement = document.getElementById('myVideo');
-        var videoElement = $('#myVideo')[0];
-        videoElement.autoplay = true;
-        console.log(videoElement);
-
-        var nowMoment = new Date(Date.parse('1970-01-01T00:00:00.000'));
-        function updateTalkTime() {
-            TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
-            nowMoment.setSeconds(nowMoment.getSeconds() + 1);
-        };
-        var talkTime = null;
-
-        var globalSession = null;
-
-        var mediaConstraints = {
-            audio: true,
-            video: true
-        };
-
-        var mediaStream = null;
-
-        var options = {
-            media                  : {
-                constraints        : mediaConstraints,
-                stream             : mediaStream,
-                render             : {
-                    remote         : videoElement
-                }
-            },
-            extraHeaders           : [ 'X-WEBRTC-UA: zoiper' ],
-            rel100                 : SIP.C.supported.SUPPORTED
-        };
-
         var startResponse = SmsHandler.start({}, function() {
             $scope.msisdn = startResponse.msisdn;
             var sipProxy = startResponse.sipproxy;
@@ -303,6 +168,141 @@ ONEmSimModule.controller('mainController', [
             console.log("msisdn: " + $scope.msisdn);
             console.log("SIP Proxy: " + sipProxy);
             console.log("web socket protocol: " + wsProtocol);
+
+            var isInCall = 0;
+
+            var URL = window.URL || window.webkitURL;
+
+            //These are the variables needed for the code found at https://chromium.googlesource.com/chromium/src.git/+/lkgr/chrome/test/data/webrtc/adapter.js?autodive=0%2F
+            var RTCPeerConnection = null;
+            var getUserMedia = null;
+            var attachMediaStream = null;
+            var reattachMediaStream = null;
+            var webrtcDetectedBrowser = null;
+            var webrtcDetectedVersion = null;
+
+            //function trace(text) {
+            //    // This function is used for logging.
+            //    if (text[text.length - 1] == '\n') {
+            //        text = text.substring(0, text.length - 1);
+            //    };
+            //    console.log((performance.now() / 1000).toFixed(3) + ": " + text);
+            //};
+
+            if (navigator.mozGetUserMedia) {
+                console.log("This appears to be Firefox");
+                webrtcDetectedBrowser = "firefox";
+                webrtcDetectedVersion = parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1]);
+                // The RTCPeerConnection object.
+                RTCPeerConnection = mozRTCPeerConnection;
+                // The RTCSessionDescription object.
+                RTCSessionDescription = mozRTCSessionDescription;
+                // Get UserMedia (only difference is the prefix).
+                // Code from Adam Barth.
+                getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+                // Attach a media stream to an element.
+                attachMediaStream = function(element, stream) {
+                    console.log("Attaching media stream");
+                    element.mozSrcObject = stream;
+                    element.play();
+                };
+                reattachMediaStream = function(to, from) {
+                    console.log("Reattaching media stream");
+                    to.mozSrcObject = from.mozSrcObject;
+                    to.play();
+                };
+            } else if (navigator.webkitGetUserMedia) {
+                console.log("This appears to be Chrome");
+                webrtcDetectedBrowser = "chrome";
+                webrtcDetectedVersion = parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]);
+                // The RTCPeerConnection object.
+                RTCPeerConnection = webkitRTCPeerConnection;
+                // Get UserMedia (only difference is the prefix).
+                // Code from Adam Barth.
+                getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+                // Attach a media stream to an element.
+                attachMediaStream = function(element, stream) {
+                    console.log("Attaching media stream");
+                    if (typeof element.srcObject !== 'undefined') {
+                        element.srcObject = stream;
+                    } else if (typeof element.mozSrcObject !== 'undefined') {
+                        element.mozSrcObject = stream;
+                    } else if (typeof element.src !== 'undefined') {
+                        element.src = URL.createObjectURL(stream);
+                    } else {
+                        console.log('Error attaching stream to element.');
+                    };
+                };
+                reattachMediaStream = function(to, from) {
+                    console.log("Reattaching media stream");
+                    to.src = from.src;
+                };
+                // The representation of tracks in a stream is changed in M26.
+                // Unify them for earlier Chrome versions in the coexisting period.
+                if (!webkitMediaStream.prototype.getVideoTracks) {
+                    webkitMediaStream.prototype.getVideoTracks = function() {
+                        return this.videoTracks;
+                    };
+                    webkitMediaStream.prototype.getAudioTracks = function() {
+                        return this.audioTracks;
+                    };
+                };
+                // New syntax of getXXXStreams method in M26.
+                if (!webkitRTCPeerConnection.prototype.getLocalStreams) {
+                    webkitRTCPeerConnection.prototype.getLocalStreams = function() {
+                        return this.localStreams;
+                    };
+                    webkitRTCPeerConnection.prototype.getRemoteStreams = function() {
+                        return this.remoteStreams;
+                    };
+                }
+            } else {
+                console.log("Browser does not appear to be WebRTC-capable");
+            };
+
+            //These are the buttons of the phone's user interface:
+            var AnswerButton = $('.call_tools a.answer');
+            var RejectButton = $('.call_tools a.cancel');
+            var CallButton = $('.screen a.call');
+            var ClosePanelButton = $('.screen a.closer');
+            var TalkTimer = $('.answer .talktime');
+
+            //var audioElement = document.getElementById('myAudio');
+            var audioElement = $('#myAudio')[0];
+            audioElement.autoplay = true;
+            console.log(audioElement);
+            //var videoElement = document.getElementById('myVideo');
+            var videoElement = $('#myVideo')[0];
+            videoElement.autoplay = true;
+            console.log(videoElement);
+
+            var nowMoment = new Date(Date.parse('1970-01-01T00:00:00.000'));
+            function updateTalkTime() {
+                TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
+                nowMoment.setSeconds(nowMoment.getSeconds() + 1);
+            };
+            var talkTime = null;
+
+            var globalSession = null;
+
+            var mediaConstraints = {
+                audio: true,
+                video: true
+            };
+
+            var mediaStream = null;
+
+            var options = {
+                media                  : {
+                    constraints        : mediaConstraints,
+                    stream             : mediaStream,
+                    render             : {
+                        remote         : videoElement
+                    }
+                },
+                extraHeaders           : [ 'X-WEBRTC-UA: zoiper' ],
+                rel100                 : SIP.C.supported.SUPPORTED
+            };
 
             //SIP.js configuration:
             var configuration = {
@@ -324,116 +324,9 @@ ONEmSimModule.controller('mainController', [
 
             var target = null;
 
-            function useSession(s) {
-                globalSession = s;
-
-                globalSession.on('progress',function(response) {
-                    console.log('outgoing call - progress with the response: ' + response);
-
-                    //Outgoing call; play ringback tone
-                    console.log("Playing outgoing callback tone:");
-                    audioElement.src = "/sounds/ringing_tone_uk_new.wav";
-
-                    //audioElement.play();
-                    if(webrtcDetectedBrowser == "firefox") {
-                        audioElement.play();
-                    };
-
-                });
-                globalSession.on('accepted',function(data) {
-                    console.log('outgoing call - accepted with data: ' + data);
-                    audioElement.pause();
-
-                    //Schedule update of talk time every second:
-                    talkTime = setInterval(updateTalkTime, 1000);
-
-                    //RTCPeerConnection.getLocalStreams/getRemoteStreams are deprecated. Use RTCPeerConnection.getSenders/getReceivers instead.
-                    //audioElement.src = window.URL.createObjectURL(globalSession.connection.getRemoteStreams()[0]);
-                    //audioElement.srcObject = globalSession.connection.getRemoteStreams()[0];
-                    // :) videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
-                    attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
-                    if(globalSession.getRemoteStreams()[0].getVideoTracks().length) {
-                        videoElement.hidden = false;
-                        $('.phone div.answer .user').addClass('.off');
-                        //.phone .answer .user.off
-                        console.log("with video");
-                    } else {
-                        videoElement.hidden = true;
-                        $('.phone div.answer .user').removeClass('.off');
-                        console.log("no video");
-                    };
-                    //if(webrtcDetectedBrowser == "firefox") {
-                    //    //audioElement.play();
-                    //    videoElement.play();
-                    //};
-                    isInCall = 1;
-                });
-                globalSession.on('rejected',function(response,cause) {
-                    console.log('outgoing call - rejected because: ' + cause);
-                    audioElement.pause();
-                });
-                globalSession.on('failed',function(response,cause) {
-                    console.log('outgoing call - failed because: ' + cause);
-                    audioElement.pause();
-                });
-                globalSession.on('terminated',function(message,cause) {
-                    console.log('outgoing call - terminated with the message: ' + message + ' because: ' + cause);
-                    audioElement.pause();
-                    videoElement.pause();
-                    videoElement.hidden = true;
-                    $('.phone div.answer .user').removeClass('.off');
-                    isInCall = 0;
-                    clearInterval(talkTime);
-                    nowMoment = new Date(Date.parse('1970-01-01T00:00:00.000'));
-                    TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
-                    $('.phone div.panel').removeClass('open');
-                    $('.phone .call_notif').removeClass('on');
-                    $('.answer ul.nums').removeClass('on');
-                    $('.answer #typed_no').val('');
-                    $('.dialer #typed_no').val('');
-                    $('.caller #typed_no').val('');
-                });
-                globalSession.on('cancel',function(){
-                    console.log('outgoing call - cancel');
-                    audioElement.pause();
-                    videoElement.pause();
-                    videoElement.hidden = true;
-                    $('.phone div.answer .user').removeClass('.off');
-                    isInCall = 0;
-                    clearInterval(talkTime);
-                    nowMoment = new Date(Date.parse('1970-01-01T00:00:00.000'));
-                    TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
-                    $('.phone div.panel').removeClass('open');
-                    $('.phone .call_notif').removeClass('on');
-                    $('.answer ul.nums').removeClass('on');
-                    $('.answer #typed_no').val('');
-                    $('.dialer #typed_no').val('');
-                    $('.caller #typed_no').val('');
-                });
-                globalSession.on('refer',globalSession.followRefer(onReferredOut));
-                globalSession.on('replaced',function(globalSession) { //I re-use the actual session for the new session. Is this OK?
-                    console.log('outgoing call - replaced');
-                });
-                globalSession.on('dtmf',function(request,dtmf) {
-                    console.log('outgoing call - dtmf received: ' + dtmf);
-                });
-                globalSession.on('muted',function(data) {
-                    console.log('outgoing call - muted');
-                });
-                globalSession.on('unmuted',function(data) {
-                    console.log('outgoing call - unmuted');
-                });
-                globalSession.on('bye',function() {
-                    console.log('outgoing call - bye');
-                    globalSession = null;
-                });
-
-                // Refer:
-                function onReferredOut(request,globalSession) { //I re-use the actual session for the new session. Is this OK?
-                    console.log('outgoing call - refer due to: ' + request);
-                };
-
-            };
+            //function useSession(s) { //Media Reuse: https://sipjs.com/guides/reuse-mediastreams/
+            //    globalSession = s;
+            //};
 
             function hangUp() {
                 if (globalSession && globalSession.startTime && !globalSession.endTime) {
@@ -442,23 +335,23 @@ ONEmSimModule.controller('mainController', [
                 }
             };
 
-            function getUserMediaSuccess (stream) {
-                console.log('getUserMedia succeeded', stream)
-                mediaStream = stream;
-
-                // Makes a call
-                useSession(phoneONEm.invite(target, {
-                    media: {
-                        stream: mediaStream,
-                        render: {
-                            remote: {
-                                video: videoElement
-                            }
-                        }
-
-                    }
-                }));
-            };
+            //function getUserMediaSuccess (stream) { //Media Reuse: https://sipjs.com/guides/reuse-mediastreams/
+            //    console.log('getUserMedia succeeded', stream)
+            //    mediaStream = stream;
+            //
+            //    // Makes a call
+            //    useSession(phoneONEm.invite(target, {
+            //        media: {
+            //            stream: mediaStream,
+            //            render: {
+            //                remote: {
+            //                    video: videoElement
+            //                }
+            //            }
+            //
+            //        }
+            //    }));
+            //};
 
             function getUserMediaFailure (e) {
                 console.error('getUserMedia failed:', e);
@@ -589,8 +482,10 @@ ONEmSimModule.controller('mainController', [
                 console.log('registrationFailed because: ' + response + ', with cause: ' + cause);
             });
 
-            phoneONEm.on('invite', function(globalSession){
+            phoneONEm.on('invite', function(session){
                 console.log('invite - incoming call');
+
+                globalSession = session
 
                 $('.phone div.caller').addClass('open');
 
@@ -624,7 +519,7 @@ ONEmSimModule.controller('mainController', [
                     //audioElement.src = window.URL.createObjectURL(globalSession.connection.getRemoteStreams()[0]);
                     //audioElement.srcObject = globalSession.connection.getRemoteStreams()[0];
                     // :) videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
-                    //attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
+                    attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
                     if(globalSession.getRemoteStreams()[0].getVideoTracks().length) {
                         videoElement.hidden = false;
                         $('.phone div.answer .user').addClass('.off');
@@ -716,19 +611,21 @@ ONEmSimModule.controller('mainController', [
                     isInCall = 1;
                 });
 
-                // End the call or reject the call:
+                // Reject the call:
                 RejectButton.click( function(){
                     console.log('RejectButton - click');
                     //phoneONEm.terminateSessions();
                     globalSession.terminate();
+                    //hangUp();
+                    if(isInCall==1) $('.phone div.answer').toggleClass('open'); //bogus!!!
                 });
 
-                //ClosePanelButton.click( function(e){
-                //    console.log('ClosePanelButton - click');
-                //    $('.phone div.panel').removeClass('open');
-                //    hangUp();
-                //    if(isInCall==1) $('.phone div.answer').toggleClass('open'); //bogus!!!
-                //});
+                ClosePanelButton.click( function(e){
+                    console.log('ClosePanelButton - click');
+                    $('.phone div.panel').removeClass('open');
+                    hangUp();
+                    if(isInCall==1) $('.phone div.answer').toggleClass('open');
+                });
 
                 //// End call in 30 seconds:
                 //setTimeout(IncomingEndCall, 30000);
@@ -744,22 +641,21 @@ ONEmSimModule.controller('mainController', [
                 console.log('message: ' + message);
             });
 
-            // For debug run this in the browser's console and reload the page:
-            // JsSIP.debug.enable('JsSIP:*');
-
             //Make a phone call:
             CallButton.click( function(){
                 console.log('CallButton - click; Call to ' + $('.dialer #typed_no').val());
                 target = 'sip:' + $('.dialer #typed_no').val() + '@' + sipProxy;
-                //globalSession = phoneONEm.invite(target, options);
-                if (mediaStream) {
-                    getUserMediaSuccess(mediaStream);
-                } else {
-                    if (SIP.WebRTC.isSupported()) {
-                        SIP.WebRTC.getUserMedia(mediaConstraints, getUserMediaSuccess, getUserMediaFailure);
-                    }
-                };
+                globalSession = phoneONEm.invite(target, options);
+                //if (mediaStream) { //Media Reuse: https://sipjs.com/guides/reuse-mediastreams/
+                //    getUserMediaSuccess(mediaStream);
+                //} else {
+                //    if (SIP.WebRTC.isSupported()) {
+                //        SIP.WebRTC.getUserMedia(mediaConstraints, getUserMediaSuccess, getUserMediaFailure);
+                //    }
+                //};
+
                 isInCall = 1;
+
                 $('.answer #typed_no').val( $('.dialer #typed_no').val() );
                 $('.dialer #typed_no').val('');
                 $('.phone div.panel').removeClass('open');
@@ -767,30 +663,150 @@ ONEmSimModule.controller('mainController', [
 
                 console.log('call initiated');
 
+                globalSession.on('progress',function(response) {
+                    console.log('outgoing call - progress with the response: ' + response);
+
+                    //Outgoing call; play ringback tone
+                    console.log("Playing outgoing callback tone:");
+                    audioElement.src = "/sounds/ringing_tone_uk_new.wav";
+
+                    //audioElement.play();
+                    if(webrtcDetectedBrowser == "firefox") {
+                        audioElement.play();
+                    };
+
+                });
+                globalSession.on('accepted',function(data) {
+                    console.log('outgoing call - accepted with data: ' + data);
+                    audioElement.pause();
+
+                    //Schedule update of talk time every second:
+                    talkTime = setInterval(updateTalkTime, 1000);
+
+                    //RTCPeerConnection.getLocalStreams/getRemoteStreams are deprecated. Use RTCPeerConnection.getSenders/getReceivers instead.
+                    //audioElement.src = window.URL.createObjectURL(globalSession.connection.getRemoteStreams()[0]);
+                    //audioElement.srcObject = globalSession.connection.getRemoteStreams()[0];
+                    // :) videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
+                    attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
+                    if(globalSession.getRemoteStreams()[0].getVideoTracks().length) {
+                        videoElement.hidden = false;
+                        $('.phone div.answer .user').addClass('.off');
+                        //.phone .answer .user.off
+                        console.log("with video");
+                    } else {
+                        videoElement.hidden = true;
+                        $('.phone div.answer .user').removeClass('.off');
+                        console.log("no video");
+                    };
+                    //if(webrtcDetectedBrowser == "firefox") {
+                    //    //audioElement.play();
+                    //    videoElement.play();
+                    //};
+                    isInCall = 1;
+                });
+                globalSession.on('rejected',function(response,cause) {
+                    console.log('outgoing call - rejected because: ' + cause);
+                    audioElement.pause();
+                });
+                globalSession.on('failed',function(response,cause) {
+                    console.log('outgoing call - failed because: ' + cause);
+                    audioElement.pause();
+                });
+                globalSession.on('terminated',function(message,cause) {
+                    console.log('outgoing call - terminated with the message: ' + message + ' because: ' + cause);
+                    audioElement.pause();
+                    videoElement.pause();
+                    videoElement.hidden = true;
+                    $('.phone div.answer .user').removeClass('.off');
+                    isInCall = 0;
+                    clearInterval(talkTime);
+                    nowMoment = new Date(Date.parse('1970-01-01T00:00:00.000'));
+                    TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
+                    $('.phone div.panel').removeClass('open');
+                    $('.phone .call_notif').removeClass('on');
+                    $('.answer ul.nums').removeClass('on');
+                    $('.answer #typed_no').val('');
+                    $('.dialer #typed_no').val('');
+                    $('.caller #typed_no').val('');
+                });
+                globalSession.on('cancel',function(){
+                    console.log('outgoing call - cancel');
+                    audioElement.pause();
+                    videoElement.pause();
+                    videoElement.hidden = true;
+                    $('.phone div.answer .user').removeClass('.off');
+                    isInCall = 0;
+                    clearInterval(talkTime);
+                    nowMoment = new Date(Date.parse('1970-01-01T00:00:00.000'));
+                    TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
+                    $('.phone div.panel').removeClass('open');
+                    $('.phone .call_notif').removeClass('on');
+                    $('.answer ul.nums').removeClass('on');
+                    $('.answer #typed_no').val('');
+                    $('.dialer #typed_no').val('');
+                    $('.caller #typed_no').val('');
+                });
+                globalSession.on('refer',globalSession.followRefer(onReferredOut));
+                globalSession.on('replaced',function(globalSession) { //I re-use the actual session for the new session. Is this OK?
+                    console.log('outgoing call - replaced');
+                });
+                globalSession.on('dtmf',function(request,dtmf) {
+                    console.log('outgoing call - dtmf received: ' + dtmf);
+                });
+                globalSession.on('muted',function(data) {
+                    console.log('outgoing call - muted');
+                });
+                globalSession.on('unmuted',function(data) {
+                    console.log('outgoing call - unmuted');
+                });
+                globalSession.on('bye',function() {
+                    console.log('outgoing call - bye');
+                    globalSession = null;
+                });
+
+                // Refer:
+                function onReferredOut(request,globalSession) { //I re-use the actual session for the new session. Is this OK?
+                    console.log('outgoing call - refer due to: ' + request);
+                };
+
                 //destination
-                console.log('Called ID: ' + $('.dialer #typed_no').val());
-                $('.answer #typed_no').val($('.dialer #typed_no').val());
-                $('.caller #typed_no').val($('.dialer #typed_no').val());
-                //console.log('Caller ID: ' + globalSession.remoteIdentity.uri.user);
+                console.log('Caller ID: ' + globalSession.remoteIdentity.uri.user);
                 //console.log('User Name: ' + globalSession.remoteIdentity.displayName);
                 //$('.answer #typed_no').val(globalSession.remoteIdentity.uri.user);
-                //$('.caller #typed_no').val(globalSession.remoteIdentity.uri.user);
+                $('.caller #typed_no').val(globalSession.remoteIdentity.uri.user);
                 //$scope.usr_name = globalSession.remoteIdentity.displayName;
 
-                //ClosePanelButton.click( function(e){
-                //    console.log('ClosePanelButton - click');
-                //    $('.phone div.panel').removeClass('open');
-                //    hangUp();
-                //    if(isInCall==1) $('.phone div.answer').toggleClass('open'); //bogus!!!
-                //});
+                // End the call:
+                RejectButton.click( function(){
+                    console.log('RejectButton - click');
+                    //phoneONEm.terminateSessions();
+                    globalSession.terminate();
+                    //hangUp();
+                    if(isInCall==1) $('.phone div.answer').toggleClass('open'); //bogus!!!
+                });
 
+                ClosePanelButton.click( function(e){
+                    console.log('ClosePanelButton - click');
+                    $('.phone div.panel').removeClass('open');
+                    hangUp();
+                    if(isInCall==1) $('.phone div.answer').toggleClass('open');
+                });
+            });
+
+            // End the call or reject the call:
+            RejectButton.click( function(){
+                console.log('RejectButton - click');
+                //phoneONEm.terminateSessions();
+                globalSession.terminate();
+                //hangUp();
+                if(isInCall==1) $('.phone div.answer').toggleClass('open'); //bogus!!!
             });
 
             ClosePanelButton.click( function(e){
                 console.log('ClosePanelButton - click');
                 $('.phone div.panel').removeClass('open');
                 hangUp();
-                if(isInCall==1) $('.phone div.answer').toggleClass('open'); //bogus!!!
+                if(isInCall==1) $('.phone div.answer').toggleClass('open');
             });
 
             window.onunload = function () {
