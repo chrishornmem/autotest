@@ -171,7 +171,7 @@ ONEmSimModule.controller('mainController', [
 
             var isInCall = 0;
 
-            var URL = window.URL || window.webkitURL;
+            //var URL = window.URL || window.webkitURL;
 
             //These are the variables needed for the code found at https://chromium.googlesource.com/chromium/src.git/+/lkgr/chrome/test/data/webrtc/adapter.js?autodive=0%2F
             var RTCPeerConnection = null;
@@ -267,12 +267,12 @@ ONEmSimModule.controller('mainController', [
             var ClosePanelButton = $('.screen a.closer');
             var TalkTimer = $('.answer .talktime');
 
-            //var audioElement = document.getElementById('myAudio');
-            var audioElement = $('#myAudio')[0];
+            var audioElement = document.getElementById('myAudio');
+            //var audioElement = $('#myAudio')[0];
             audioElement.autoplay = true;
             console.log(audioElement);
-            //var videoElement = document.getElementById('myVideo');
-            var videoElement = $('#myVideo')[0];
+            var videoElement = document.getElementById('myVideo');
+            //var videoElement = $('#myVideo')[0];
             videoElement.autoplay = true;
             console.log(videoElement);
 
@@ -517,22 +517,28 @@ ONEmSimModule.controller('mainController', [
 
                     //RTCPeerConnection.getLocalStreams/getRemoteStreams are deprecated. Use RTCPeerConnection.getSenders/getReceivers instead.
                     //audioElement.src = window.URL.createObjectURL(globalSession.connection.getRemoteStreams()[0]);
-                    //audioElement.srcObject = globalSession.connection.getRemoteStreams()[0];
-                    // :) videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
-                    attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
+                    //videoElement.srcObject = globalSession;
+                    //videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
+                    if (SIP.WebRTC.isSupported()) {
+                        SIP.WebRTC.getUserMedia(mediaConstraints, function(stream) {mediaStream = stream;}, function() {console.log("FAILED!"); });
+                    }
+                    //attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
                     if(globalSession.getRemoteStreams()[0].getVideoTracks().length) {
                         videoElement.hidden = false;
+                        videoElement.style.visibility = 'visible';
                         $('.phone div.answer .user').addClass('.off');
                         //.phone .answer .user.off
                         console.log("with video");
                     } else {
                         videoElement.hidden = true;
+                        videoElement.style.visibility = 'hidden';
                         $('.phone div.answer .user').removeClass('.off');
                         console.log("no video");
                     };
                     //if(webrtcDetectedBrowser == "firefox") {
                     //    //audioElement.play();
-                    //    videoElement.play();
+                    //    videoElement.load();
+                    //    //videoElement.play();
                     //};
                     isInCall = 1;
                 });
@@ -549,6 +555,7 @@ ONEmSimModule.controller('mainController', [
                     audioElement.pause();
                     videoElement.pause();
                     videoElement.hidden = true;
+                    videoElement.style.visibility = 'hidden';
                     $('.phone div.answer .user').removeClass('.off');
                     isInCall = 0;
                     clearInterval(talkTime);
@@ -566,6 +573,7 @@ ONEmSimModule.controller('mainController', [
                     audioElement.pause();
                     videoElement.pause();
                     videoElement.hidden = true;
+                    videoElement.style.visibility = 'hidden';
                     $('.phone div.answer .user').removeClass('.off');
                     isInCall = 0;
                     clearInterval(talkTime);
@@ -685,22 +693,28 @@ ONEmSimModule.controller('mainController', [
 
                     //RTCPeerConnection.getLocalStreams/getRemoteStreams are deprecated. Use RTCPeerConnection.getSenders/getReceivers instead.
                     //audioElement.src = window.URL.createObjectURL(globalSession.connection.getRemoteStreams()[0]);
-                    //audioElement.srcObject = globalSession.connection.getRemoteStreams()[0];
-                    // :) videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
-                    attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
+                    //videoElement.srcObject = globalSession;
+                    //videoElement.src = window.URL.createObjectURL(globalSession.getRemoteStreams()[0]);
+                    if (SIP.WebRTC.isSupported()) {
+                        SIP.WebRTC.getUserMedia(mediaConstraints, function(stream) {mediaStream = stream;}, function() {console.log("FAILED!"); });
+                    }
+                    //attachMediaStream(videoElement,globalSession.getRemoteStreams()[0]);
                     if(globalSession.getRemoteStreams()[0].getVideoTracks().length) {
                         videoElement.hidden = false;
+                        videoElement.style.visibility = 'visible';
                         $('.phone div.answer .user').addClass('.off');
                         //.phone .answer .user.off
                         console.log("with video");
                     } else {
                         videoElement.hidden = true;
+                        videoElement.style.visibility = 'hidden';
                         $('.phone div.answer .user').removeClass('.off');
                         console.log("no video");
                     };
                     //if(webrtcDetectedBrowser == "firefox") {
                     //    //audioElement.play();
-                    //    videoElement.play();
+                    //    videoElement.load();
+                    //    //videoElement.play();
                     //};
                     isInCall = 1;
                 });
@@ -717,6 +731,7 @@ ONEmSimModule.controller('mainController', [
                     audioElement.pause();
                     videoElement.pause();
                     videoElement.hidden = true;
+                    videoElement.style.visibility = 'hidden';
                     $('.phone div.answer .user').removeClass('.off');
                     isInCall = 0;
                     clearInterval(talkTime);
@@ -734,6 +749,7 @@ ONEmSimModule.controller('mainController', [
                     audioElement.pause();
                     videoElement.pause();
                     videoElement.hidden = true;
+                    videoElement.style.visibility = 'hidden';
                     $('.phone div.answer .user').removeClass('.off');
                     isInCall = 0;
                     clearInterval(talkTime);
