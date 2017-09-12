@@ -300,7 +300,7 @@ io.on('connection', function(socket) {
         clients[i].moRecord = moRecord;
 
         console.log("sending SMS");
-        sendSMS(socket.handshake.session.onemContext.msisdn, '444100', moText);
+        sendSMS(socket.handshake.session.onemContext.msisdn, '555100', moText);
 
     });
 
