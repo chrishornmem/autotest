@@ -1,5 +1,4 @@
 var express = require('express');
-//var app = require('express')();
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
@@ -16,15 +15,11 @@ var moment = require('moment');
 var _ = require('underscore-node');
 var smpp = require('smpp');
 var FileStore = require('session-file-store')(session);
-// var sharedsession = require("express-socket.io-session");
 
 require('dotenv').load();
 
 // Bring in the routes for the API (delete the default routes)
 var routesApi = require('./app_api/routes/index.js');
-
-// Bring in the data model & connect to db
-// require('./app_api/models/db');
 
 // The http server will listen to an appropriate port, or default to
 // port 6000.
@@ -90,8 +85,7 @@ var smppServer = smpp.createServer(function(session) {
         // we pause the session to prevent further incoming pdu events,
         // untill we authorize the session with some async operation.
         session.pause();
-        //     checkAsyncUserPass(pdu.system_id, pdu.password, function(err) {
-        //         if (err) {
+
         if (!(pdu.system_id == smppSystemId && pdu.password == smppPassword)) {
             session.send(pdu.response({
                 command_status: smpp.ESME_RBINDFAIL
@@ -158,7 +152,7 @@ var smppServer = smpp.createServer(function(session) {
         //   4) send the result back to the client using the saved session
         if (clientFound && (pdu.more_messages_to_send === 0 ||
                 typeof pdu.more_messages_to_send === 'undefined')) {
-            console.log("clientfound and no more messages");
+            console.log("client found and no more messages");
             console.log("clients.length:" + clients.length);
             for (i = 0; i < clients.length; i++) {
                 if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.messageWaiting) {
@@ -169,10 +163,10 @@ var smppServer = smpp.createServer(function(session) {
                         clients[i].moRecord.mtText = '';
                     } catch (err) {
                         console.log("oops no session:" + err);
-                    }
-                }
-            }
-        }
+                    };
+                };
+            };
+        };
 
     });
 
@@ -224,10 +218,10 @@ function sendSMS(from, to, text) {
             messagePartsNumber = Math.floor(textLength/70);
             if(messagePartsNumber * 70 != textLength) messagePartsNumber++;
 
-            udh.writeUInt8(0x05,0); //Length of the UDF
-            udh.writeUInt8(0x00,1); //Indicator for concatenated message
-            udh.writeUInt8(0x03,2); //  Subheader Length ( 3 bytes)
-            udh.writeUInt8(referenceCSMS,3); //Same reference for all concatenated messages  
+            udh.writeUInt8(0x05,0);               //Length of the UDF
+            udh.writeUInt8(0x00,1);               //Indicator for concatenated message
+            udh.writeUInt8(0x03,2);               //Subheader Length ( 3 bytes)
+            udh.writeUInt8(referenceCSMS,3);      //Same reference for all concatenated messages  
             udh.writeUInt8(messagePartsNumber,4); //Number of total messages in the concatenation
 
             while (textLength > 0) {
@@ -240,7 +234,7 @@ function sendSMS(from, to, text) {
                     textLength = 0;
                 };
 
-                udh.writeUInt8(messageNumber+1,5); //Sequence number ( used by the mobile to concatenate the split messages)
+                udh.writeUInt8(messageNumber+1,5); //Sequence number (used by the mobile to concatenate the split messages)
 
                 var buffer = new Buffer(2 * shortMessageLength) ;
                 for (var i = 0 ; i < shortMessageLength; i++) {
@@ -278,7 +272,7 @@ io.on('connection', function(socket) {
 
     socket.emit(socket.handshake.session);
 
-    if (!socket.handshake.session.onemContext) { // must be first time, or expired
+    if (!socket.handshake.session.onemContext) { //must be first time, or expired
         var msisdn = moment().format('YYMMDDHHMMSS');
         console.log("msisdn:" + msisdn);
         socket.handshake.session.onemContext = { msisdn   : msisdn};
@@ -304,6 +298,11 @@ io.on('connection', function(socket) {
 
     });
 
+    socket.on('thePath', function(pathText) {
+        console.log('User path is: ');
+        console.log(pathText);
+    });
+
     socket.on('disconnect', function() {
         console.info('Client gone (id=' + socket.id + ').');
         var index = clients.indexOf(socket);
@@ -314,33 +313,33 @@ io.on('connection', function(socket) {
 
 app.get('/api/start', function(req, res, next) {
 
-  // if first time (no session) then generate a virtual MSISDN using current timestamp, which is saved in session cookie
-  if (!req.session.onemContext) { // must be first time, or expired
-    var msisdn = moment().format('YYMMDDHHMMSS');
-    console.log("msisdn:" + msisdn);
+    // if first time (no session) then generate a virtual MSISDN using current timestamp, which is saved in session cookie
+    if (!req.session.onemContext) { // must be first time, or expired
+        var msisdn = moment().format('YYMMDDHHMMSS');
+        console.log("msisdn:" + msisdn);
 
-    req.session.onemContext = { msisdn: msisdn };
-    //Should I save it here, also??????
-  }
+        req.session.onemContext = { msisdn: msisdn };
+        //Should I save it here, also??????
+    }
 
-  var httpProtocol = req.get('Referer').split(":")[0];
-  console.log(httpProtocol);
-  console.log(wsProtocol);
+    var httpProtocol = req.get('Referer').split(":")[0];
+    console.log(httpProtocol);
+    console.log(wsProtocol);
   
-  if (httpProtocol == 'https') {
-    // the used protocol is HTTPS
-    console.log('The HTTPS protocol has been used; "wss" will be used for WebRTC');
-    wsProtocol = "wss";
-  } else {
-    console.log('It appears that HTTP protocol has been used; environment provided protocol or "ws" will be used for WebRTC');
-    wsProtocol = process.env.WS_PROTOCOL || "ws";
-  };
-  console.log(wsProtocol);
+    if (httpProtocol == 'https') {
+        // the used protocol is HTTPS
+        console.log('The HTTPS protocol has been used; "wss" will be used for WebRTC');
+        wsProtocol = "wss";
+    } else {
+        console.log('It appears that HTTP protocol has been used; environment provided protocol or "ws" will be used for WebRTC');
+        wsProtocol = process.env.WS_PROTOCOL || "ws";
+    };
+    console.log(wsProtocol);
 
-  res.json({ msisdn     : req.session.onemContext.msisdn,
-             sipproxy   : sipProxy,
-             wsprotocol : wsProtocol
-  });
+    res.json({ msisdn     : req.session.onemContext.msisdn,
+               sipproxy   : sipProxy,
+               wsprotocol : wsProtocol
+    });
 
 });
 
@@ -353,9 +352,9 @@ app.get('/api/start', function(req, res, next) {
 // });
 
 app.get('/*', function(req, res, next) {
-  console.log("caught default route");
-  // Just send the index.html for other files to support HTML5Mode
-  res.sendFile('/public/views/index.html', { root: __dirname });
+    console.log("caught default route");
+    // Just send the index.html for other files to support HTML5Mode
+    res.sendFile('/public/views/index.html', { root: __dirname });
 });
 
 // error handling middleware should be loaded after the loading the routes
@@ -365,7 +364,6 @@ if ('development' == app.get('env')) {
 
 smppServer.listen(smppPort);
 server.listen(theport);
-//io.listen(http);
 
 module.exports = app;
 
