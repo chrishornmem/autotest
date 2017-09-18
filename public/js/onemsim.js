@@ -354,6 +354,7 @@ ONEmSimModule.controller('mainController', [
 
             $('a.open_dialer').click(function(e) {
                 e.preventDefault();
+                $(this).parents('.phone').find('.screen_wrp').addClass('open');
                 $(this).parents('.phone').find('div.dialer').toggleClass('open');
                 console.log('[UI]: Dialer state changed!');
                 return false;
@@ -429,6 +430,7 @@ ONEmSimModule.controller('mainController', [
 
             $('.answer a.minimize').click(function(e) {
                 e.preventDefault();
+                $('.phone .screen_wrp').removeClass('open');
                 $('.call_notif').addClass('on');
                 $('.phone div.panel').removeClass('open');
                 console.log('[UI]: Pannels minimized from answer panel');
@@ -437,6 +439,7 @@ ONEmSimModule.controller('mainController', [
 
             $('.call_notif a.resume').click(function(e) {
                 e.preventDefault();
+                $('.phone .screen_wrp').addClass('open');
                 $('.call_notif').removeClass('on');
                 $('.phone div.panel.answer').addClass('open');
                 console.log('[UI]: Answer panel maximized');
@@ -483,6 +486,7 @@ ONEmSimModule.controller('mainController', [
                 //Identity display:
                 console.log('Caller ID: ' + globalSession.remote_identity.uri.user);
                 console.log('User Name: ' + globalSession.remote_identity.display_name);
+                $('.phone .screen_wrp').addClass('open');
                 $('.answer #typed_no').val(globalSession.remote_identity.uri.user);
                 $('.caller #typed_no').val(globalSession.remote_identity.uri.user);
                 $scope.usr_name = globalSession.remote_identity.display_name;
@@ -542,11 +546,12 @@ ONEmSimModule.controller('mainController', [
                     videoElement.pause();
                     videoElement.hidden = true;
                     videoElement.style.visibility = 'hidden';
-                    $('.phone div.answer .user').removeClass('.off');
                     isInCall = 0;
                     clearInterval(talkTime);
                     nowMoment = new Date(1970,0);
                     TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
+                    $('.phone div.answer .user').removeClass('.off');
+                    $('.phone .screen_wrp').removeClass('open');
                     $('.phone div.panel').removeClass('open');
                     $('.phone .call_notif').removeClass('on');
                     $('.answer ul.nums').removeClass('on');
@@ -561,11 +566,12 @@ ONEmSimModule.controller('mainController', [
                     videoElement.pause();
                     videoElement.hidden = true;
                     videoElement.style.visibility = 'hidden';
-                    $('.phone div.answer .user').removeClass('.off');
                     isInCall = 0;
                     clearInterval(talkTime);
                     nowMoment = new Date(1970,0);
                     TalkTimer.text('Current call: ' + dateFilter(nowMoment,'HH:mm:ss'));
+                    $('.phone div.answer .user').removeClass('.off');
+                    $('.phone .screen_wrp').removeClass('open');
                     $('.phone div.panel').removeClass('open');
                     $('.phone .call_notif').removeClass('on');
                     $('.answer ul.nums').removeClass('on');
@@ -668,6 +674,7 @@ ONEmSimModule.controller('mainController', [
 
             ClosePanelButton.click(function(e){
                 console.log('ClosePanelButton - click');
+                $('.phone .screen_wrp').removeClass('open');
                 $('.phone div.panel').removeClass('open');
                 if(phoneONEm.isConnected()) phoneONEm.terminateSessions();
                 //if(phoneONEm.isConnected()) globalSession.terminate();

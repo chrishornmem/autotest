@@ -29,12 +29,17 @@ body.full {
 
 .phone .screen_wrp {
     position: absolute;
-    display: block;
+    display: none;
     top: 124px;
     bottom: 126px;
     left: 41px;
     right: 37px;
-    z-index: 3;
+    z-index: 1;
+}
+
+.phone .screen_wrp.open{
+    display: block;
+    z-index: 10;
 }
 
 .phone .panel {
@@ -504,7 +509,7 @@ body.full {
     bottom: 126px;
     left: 41px;
     right: 37px;
-    z-index: 1;
+    z-index: 9;
 }
 
 .phone .sms-response-pos {
@@ -608,8 +613,8 @@ body.full {
 
 .phone .call_notif {
     position: absolute;
-    display: block;
-    top: 120px;
+    display: none;
+    top: 90px;
     left: 42px;
     right: 37px;
     text-align: center;
@@ -617,19 +622,27 @@ body.full {
     padding: 8px;
     font-size: 14px;
     color: #fff;
-    background: #85C06E;
-    z-index: 3;
-    transform: translateX(-100%);
+    background: #f0f0f0;
+    z-index: 14;
+    color: #f0f0f0;
     opacity: 0;
 }
 
-.phone .call_notif.on { transform: translateX(0); opacity: 1; }
+.phone .call_notif.on { 
+    display: block;
+    background: #85C06E;
+    color: #fff; 
+    opacity: 1; 
+    z-index: 20;
+}
 
-.phone .call_notif a { color: #fff; }
+.phone .call_notif a { color: #f0f0f0; }
+
+.phone .call_notif.on a { color: #fff; }
 
 .phone .form-control {
     padding: 3px 12px;
-    height: 40px; /**/
+    height: 40px;
 }
 
 
