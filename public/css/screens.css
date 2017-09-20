@@ -2,7 +2,7 @@ body {
     color: #333;
     font-size: 18px;
     line-height: 1.3;
-    font-weight: 300; 
+    font-weight: 300;
     font-family: 'Merriweather', serif;
     font-family: 'Open Sans', sans-serif;
     background: #f1f1f1;
@@ -141,11 +141,11 @@ body.full {
  *
  *----------------------------------------------------------------------------------------*/
 
-.phone.full { 
+.phone.full {
     margin-top: 0;
     position: fixed;
     top: 0; left: 0; bottom: 0;
-    width: 100%; 
+    width: 100%;
 }
 
 .phone.full .screen_wrp {
@@ -271,13 +271,13 @@ body.full {
     15% { background: rgba(0, 0, 0, 0.09); }
     100% { background: rgba(0,0,0,0.03); }
 }
-   
+
 @-moz-keyframes numClick {
     0% { background: rgba(0,0,0,0.03); }
     15% { background: rgba(0, 0, 0, 0.09); }
     100% { background: rgba(0,0,0,0.03); }
 }
- 
+
 @-o-keyframes numClick {
     0% { background: rgba(0,0,0,0.03); }
     15% { background: rgba(0, 0, 0, 0.09); }
@@ -437,11 +437,13 @@ body.full {
     border-radius: 10%;
     overflow: hidden;
 }
+
 .phone .answer .video video{
     display:block;
     width:100%;
     height:auto;
 }
+
 .phone .answer .video.off {
     display: none;
 }
@@ -628,11 +630,11 @@ body.full {
     opacity: 0;
 }
 
-.phone .call_notif.on { 
+.phone .call_notif.on {
     display: block;
     background: #85C06E;
-    color: #fff; 
-    opacity: 1; 
+    color: #fff;
+    opacity: 1;
     z-index: 20;
 }
 
@@ -664,7 +666,7 @@ a.full {
     -webkit-transition: all 0.4s ease;
        -moz-transition: all 0.4s ease;
          -o-transition: all 0.4s ease;
-            transition: all 0.4s ease; 
+            transition: all 0.4s ease;
 }
 
 a.full:hover { opacity: 1; }
@@ -673,7 +675,7 @@ a.full img {
     -webkit-transition: all 0.4s ease;
        -moz-transition: all 0.4s ease;
          -o-transition: all 0.4s ease;
-            transition: all 0.4s ease; 
+            transition: all 0.4s ease;
 }
 
 a.full:hover img {

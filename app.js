@@ -314,7 +314,7 @@ io.on('connection', function(socket) {
 app.get('/api/start', function(req, res, next) {
 
     // if first time (no session) then generate a virtual MSISDN using current timestamp, which is saved in session cookie
-    if (!req.session.onemContext) { // must be first time, or expired
+    if (!req.session.onemContext) { //must be first time, or expired
         var msisdn = moment().format('YYMMDDHHMMSS');
         console.log("msisdn:" + msisdn);
 
