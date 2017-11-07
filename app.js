@@ -43,7 +43,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(path.join(__dirname, 'node_modules'))); //TODO: Adapt this root for JsSIP also so it won;t be necessary to use next one:
 // JsSIP is not designed to use "express" library. To be loaded we need its path:
 app.use(express.static(path.join(__dirname, 'node_modules/jssip/dist')));
 

@@ -113,7 +113,7 @@
                 <div ng-repeat="obj in results track by $index">
                     <div ng-if="obj.type == 'mt'" class="sms-mt">
                         <div class="sms-placeholder">
-                            <div class="sms-mt-container">
+                            <div class="sms-mt-container" ng-bind-html="obj.value | linky:'_blank' | nl2br">
                                 <span>{{obj.value}}</span>
                             </div> <!-- /sms-mt-container -->
                             <div ng-if="smsLength" class="sms-length">
