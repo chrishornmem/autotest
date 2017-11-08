@@ -540,10 +540,11 @@ body.full {
     padding-bottom: 5px;
     padding-left: 10px;
     padding-right: 10px;
-    padding:14px;
+    padding: 8px;
     background-color: #e0e0e0;
     font-size: 13.5px;
     line-height: 18px;
+    word-wrap: break-word;
     vertical-align: top;
 }
 
