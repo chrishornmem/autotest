@@ -31,6 +31,7 @@ var smppPassword = process.env.SMPP_PASSWORD || "password";
 var smppPort = process.env.SMPP_PORT || 3775;
 var sipProxy = process.env.SIP_PROXY || "zoiper.dhq.onem";
 var wsProtocol = process.env.WS_PROTOCOL || "ws";
+var shortNumber = process.env.SHORT_NUMBER || "555100";
 
 var smppSession; // the SMPP session context saved globally.
 var referenceCSMS = 0; // CSMS reference number that uniquely identify a split sequence of SMSes.
@@ -293,8 +294,9 @@ io.on('connection', function(socket) {
         var i = clients.indexOf(socket);
         clients[i].moRecord = moRecord;
 
-        console.log("sending SMS");
-        sendSMS(socket.handshake.session.onemContext.msisdn, '555100', moText);
+        console.log("sending SMS to Short Number " + shortNumber);
+        // sendSMS(socket.handshake.session.onemContext.msisdn, '555100', moText);
+        sendSMS(socket.handshake.session.onemContext.msisdn, shortNumber, moText);
 
     });
 
