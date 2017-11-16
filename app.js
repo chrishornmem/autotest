@@ -274,7 +274,7 @@ io.on('connection', function(socket) {
     socket.emit(socket.handshake.session);
 
     if (!socket.handshake.session.onemContext) { //must be first time, or expired
-        var msisdn = moment().format('YYMMDDHHMMSS');
+        var msisdn = moment().format('YYMMDDHHmmSS');
         console.log("msisdn:" + msisdn);
         socket.handshake.session.onemContext = { msisdn   : msisdn};
         socket.handshake.session.save();
@@ -317,7 +317,7 @@ app.get('/api/start', function(req, res, next) {
 
     // if first time (no session) then generate a virtual MSISDN using current timestamp, which is saved in session cookie
     if (!req.session.onemContext) { //must be first time, or expired
-        var msisdn = moment().format('YYMMDDHHMMSS');
+        var msisdn = moment().format('YYMMDDHHmmSS');
         console.log("msisdn:" + msisdn);
 
         req.session.onemContext = { msisdn: msisdn };
