@@ -37,6 +37,18 @@ var smppSession; // the SMPP session context saved globally.
 var referenceCSMS = 0; // CSMS reference number that uniquely identify a split sequence of SMSes.
 var resArray = [];
 var clients = [];
+var idMsg = 0;
+//The message state to be used in receipts:
+var stateMsg = {
+    'ENROUTE'       : {'Value': 1, 'Status': 'ENROUTE'},
+    'DELIVERED'     : {'Value': 2, 'Status': 'DELIVRD'},
+    'EXPIRED'       : {'Value': 3, 'Status': 'EXPIRED'},
+    'DELETED'       : {'Value': 4, 'Status': 'DELETED'},
+    'UNDELIVERABLE' : {'Value': 5, 'Status': 'UNDELIV'},
+    'ACCEPTED'      : {'Value': 6, 'Status': 'ACCEPTD'},
+    'UNKNOWN'       : {'Value': 7, 'Status': 'UNKNOWN'},
+    'REJECTED'      : {'Value': 8, 'Status': 'REJECTD'}
+};
 
 app.use(logger('dev'));
 app.use(methodOverride());
@@ -113,11 +125,23 @@ var smppServer = smpp.createServer(function(session) {
 
     smppSession.on('submit_sm', function(pdu) {
 
+        var submitDate = moment().format('YYMMDDHHmm');
+        var doneDate = moment().format('YYMMDDHHmm');
+        var statMsg = stateMsg.DELIVERED.Status; //'DELIVRD';
+        var statMsgValue = stateMsg.DELIVERED.Value;
+        var errMsg = '000';
+        var dlvrdMsg = '001';
+        var endmsgText = 20;
+        var msgText = 'Message acknowledged';
+
         var clientFound = false;
 
         console.log("submit_sm received, sequence_number:" + pdu.sequence_number + " isResponse:" + pdu.isResponse());
 
-        smppSession.send(pdu.response());
+        var hexidMsg = idMsg.toString(16);
+        var pad = '00000000000000000000';
+        hexidMsg = pad.substring(0, pad.length - hexidMsg.length) + hexidMsg; //TODO: If hexidMsg longer than 20 digits (!!!) display its last 20 digits
+        smppSession.send(pdu.response({message_id: hexidMsg}));
 
         if (pdu.short_message.length === 0) {
             console.log("** payload being used **");
@@ -161,13 +185,80 @@ var smppServer = smpp.createServer(function(session) {
                         console.log("trying response: " + clients[i].moRecord.mtText);
                         clients[i].moRecord.messageWaiting = false;
                         clients[i].moRecord.socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
+                        doneDate = moment().format('YYMMDDHHmm');
+
+                        if (clients[i].moRecord.mtText.length < 20) {
+                            endmsgText = clients[i].moRecord.mtText.length;
+                        };
+                        msgText = clients[i].moRecord.mtText.substring(0, endmsgText);
+
                         clients[i].moRecord.mtText = '';
                     } catch (err) {
                         console.log("oops no session:" + err);
+                        doneDate = moment().format('YYMMDDHHmm');
+                        statMsg = stateMsg.DELETED.Status; //'DELETED';
+                        statMsgValue = stateMsg.DELETED.Value;
+                        errMsg = '001';
+                        dlvrdMsg = '000';
                     };
                 };
             };
+        } else {
+           doneDate = moment().format('YYMMDDHHmm');
+           statMsg = stateMsg.UNDELIVERABLE.Status; //'UNDELIV';
+           statMsgValue = stateMsg.UNDELIVERABLE.Value;
+           errMsg = '001';
+           dlvrdMsg = '000';
         };
+
+
+        //Probably the submit receipt is sent like this:
+        //        REGISTERED_DELIVERY: {
+        //        FINAL:                    0x01,
+        //        FAILURE:                  0x02,
+
+        //REGISTERED_DELIVERY.FINAL | REGISTERED_DELIVERY.FAILURE = 0x03
+
+        //The delivery reports are sent to the client using the 'deliver_sm' packet.
+        //This is the same packet as used to deliver incoming messages.
+        //To detect whether a 'deliver_sm' is a delivery report or a message, you have to check the 'esm_class' field.
+        //    If bit 2 of this byte is set ( 0x04 ), it is a delivery report.
+        //To use delivery reports, you have to setup a transceiver connection to the SMPP provider, because you are going to send and receive messages.
+        //The delivery status is encoded in the 'short_message' field as an ASCII text message.
+        //This format is product specific, but the following format is used by most SMPP providers:
+        //id:c449ab9744f47b6af1879e49e75e4f40 sub:001 dlvrd:0 submit date:0610191018 done date:0610191018 stat:ACCEPTD err:0 text:This is an Acti
+        //id:7220bb6bd0be98fa628de66590f80070 sub:001 dlvrd:1 submit date:0610190851 done date:0610190951 stat:DELIVRD err:0 text:This is an Acti
+        //id:b756c4f97aa2e1e67377dffc5e2f7d9b sub:001 dlvrd:0 submit date:0610191211 done date:0610191211 stat:REJECTD err:1 text:This is an Acti
+        //id:bd778cd76ae9e79da2ddc8188c68f8c1 sub:001 dlvrd:0 submit date:0610191533 done date:0610191539 stat:UNDELIV err:1 text:This is an Acti
+
+        if((pdu.registered_delivery & 0x01) == 0x01) {
+        //if((pdu.registered_delivery & pdu.REGISTERED_DELIVERY.FINAL) == pdu.REGISTERED_DELIVERY.FINAL){
+            var dlReceipt = '';
+
+            dlReceipt = 'id:' + hexidMsg + ' sub:001 dlvrd:' + dlvrdMsg +
+                ' submit date:' + submitDate + ' done date:' + doneDate + ' stat:' + statMsg + ' err:' + errMsg + ' text:' + msgText;
+
+            smppSession.deliver_sm({
+                source_addr: pdu.destination_addr,
+                source_addr_ton: 1,
+                source_addr_npi: 0,
+                destination_addr: shortNumber,
+                destination_addr_ton: 1,
+                destination_addr_npi: 0,
+                esm_class: 4,
+                data_coding: 0,
+                short_message: dlReceipt,
+                message_state: statMsgValue,
+                receipted_message_id: hexidMsg
+            }, function(pdu) {
+                if (pdu.command_status === 0) {
+                    // Message successfully sent
+                    console.log("Delievry Receipt sent!");
+                }
+            });
+        };
+
+        idMsg++;
 
     });
 
