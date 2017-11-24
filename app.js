@@ -125,23 +125,32 @@ var smppServer = smpp.createServer(function(session) {
 
     smppSession.on('submit_sm', function(pdu) {
 
-        var submitDate = moment().format('YYMMDDHHmm');
-        var doneDate = moment().format('YYMMDDHHmm');
-        var statMsg = stateMsg.DELIVERED.Status; //'DELIVRD';
-        var statMsgValue = stateMsg.DELIVERED.Value;
-        var errMsg = '000';
-        var dlvrdMsg = '001';
-        var endmsgText = 20;
+        //The delivery reports are sent to the client using the 'deliver_sm' packet.
+        //This is the same packet as used to deliver incoming messages.
+        //To detect whether a 'deliver_sm' is a delivery report or a message, you have to check the 'esm_class' field.
+        //    If bit 2 of this byte is set ( 0x04 ), it is a delivery report.
+        //The delivery status is encoded in the 'short_message' field as an ASCII text message and it is also added as SMS options.
+        //The delivery receipts will be sent once for the whole concatenated message,
+        //    so multi part messages will get a single delivery receipt, when the last part is received and the message is sent to the web client.
+        //Various fields are used in delivery reports:
+        var submitDate = moment().format('YYMMDDHHmm'); //The submitting moment is the moment when 'submit_sm' event is fired.
+        var doneDate = moment().format('YYMMDDHHmm');   //The delivering moment will be updated later on, when the message will be sent over Socket.IO connection.
+        var statMsg = stateMsg.DELIVERED.Status; //'DELIVRD'; // \_The state of the message is encoded with both letters and numbers
+        var statMsgValue = stateMsg.DELIVERED.Value;          // / The default state of the message is "delivered"
+        var errMsg = '000'; //No error in message delivery.
+        var dlvrdMsg = '001'; //One message delivered. This is a constant for our server since we do not support multiple recipients.
+        var endmsgText = 20;  //The snippet of message to be transmitted back in delivery report will be of maximum 20 characters.
         var msgText = 'Message acknowledged';
 
         var clientFound = false;
 
-        console.log("submit_sm received, sequence_number:" + pdu.sequence_number + " isResponse:" + pdu.isResponse());
+        console.log("submit_sm received, sequence_number: " + pdu.sequence_number + " isResponse: " + pdu.isResponse());
 
-        var hexidMsg = idMsg.toString(16);
-        var pad = '00000000000000000000';
+        var hexidMsg = idMsg.toString(16); //idMsg is a global identifier, at the server level. It will be sent back to submitter
+                                           //in both the submit response and in the delivery reports; it is the same for a certain message.
+        var pad = '00000000000000000000';  //idMsg should be sent as 20 hex digits zero padded.
         hexidMsg = pad.substring(0, pad.length - hexidMsg.length) + hexidMsg; //TODO: If hexidMsg longer than 20 digits (!!!) display its last 20 digits
-        smppSession.send(pdu.response({message_id: hexidMsg}));
+        smppSession.send(pdu.response({message_id: hexidMsg})); //submit_response; we've received the submit from the ESME and we confirm it with the message_id
 
         if (pdu.short_message.length === 0) {
             console.log("** payload being used **");
@@ -150,42 +159,42 @@ var smppServer = smpp.createServer(function(session) {
             mtText = pdu.short_message.message;
         }
 
-        console.log("mtText:" + mtText);
+        console.log("mtText: " + mtText);
 
-        console.log("more messages:" + pdu.more_messages_to_send);
+        console.log("more messages: " + pdu.more_messages_to_send);
 
-        // retrieve the session information based on the msisdn
+        // Retrieve the session information based on the MSISDN:
         for (var i = 0; i < clients.length; i++) {
             if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.msisdn === pdu.destination_addr) {
                 clients[i].moRecord.messageWaiting = true;
-                clients[i].moRecord.mtText = clients[i].moRecord.mtText + mtText;
+                clients[i].moRecord.mtText = clients[i].moRecord.mtText + mtText; // build up the text to be sent to the web client.
                 clientFound = true;
-                console.log("client found");
+                console.log("Client found!");
             }
         }
 
         // if the session is found but there are more messages to come, then concatenate the message and stop (wait for final message before sending)
         if (clientFound && pdu.more_messages_to_send === 1) {
-            console.log("more mesages to send, so returning");
+            console.log("More mesages to send, so returning!");
             return;
         }
 
-        // if this is the last message in the sequence, we can:
+        // We're here only for the last message; if this is the last message in the sequence, we can:
         //   1) delete the session
         //   2) retrieve the saved/concatenated message string
         //   3) reset the message string to blank
         //   4) send the result back to the client using the saved session
         if (clientFound && (pdu.more_messages_to_send === 0 ||
                 typeof pdu.more_messages_to_send === 'undefined')) {
-            console.log("client found and no more messages");
-            console.log("clients.length:" + clients.length);
+            console.log("Client found and there are no more messages to be received for it!");
+            console.log("clients.length: " + clients.length);
             for (i = 0; i < clients.length; i++) {
                 if (typeof clients[i].moRecord !== 'undefined' && clients[i].moRecord.messageWaiting) {
                     try {
                         console.log("trying response: " + clients[i].moRecord.mtText);
                         clients[i].moRecord.messageWaiting = false;
-                        clients[i].moRecord.socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText });
-                        doneDate = moment().format('YYMMDDHHmm');
+                        clients[i].moRecord.socket.emit('MT SMS', { mtText: clients[i].moRecord.mtText }); //Send the whole message at once to the web clients.
+                        doneDate = moment().format('YYMMDDHHmm'); // This is the delivery moment. Record it for delivery reporting.
 
                         if (clients[i].moRecord.mtText.length < 20) {
                             endmsgText = clients[i].moRecord.mtText.length;
@@ -194,76 +203,57 @@ var smppServer = smpp.createServer(function(session) {
 
                         clients[i].moRecord.mtText = '';
                     } catch (err) {
-                        console.log("oops no session:" + err);
+                        console.log("oops no session: " + err);
                         doneDate = moment().format('YYMMDDHHmm');
-                        statMsg = stateMsg.DELETED.Status; //'DELETED';
+                        statMsg = stateMsg.DELETED.Status; //'DELETED'; // If the socket emit fails, we lose this message. It is in deleted state.
                         statMsgValue = stateMsg.DELETED.Value;
-                        errMsg = '001';
-                        dlvrdMsg = '000';
+                        errMsg = '001'; // Error sending the message
+                        dlvrdMsg = '000'; // No message was delivered
                     };
                 };
             };
         } else {
            doneDate = moment().format('YYMMDDHHmm');
-           statMsg = stateMsg.UNDELIVERABLE.Status; //'UNDELIV';
+           statMsg = stateMsg.UNDELIVERABLE.Status; //'UNDELIV'; //If no clients found to send this message to, this message is undeliverable.
            statMsgValue = stateMsg.UNDELIVERABLE.Value;
-           errMsg = '001';
-           dlvrdMsg = '000';
+           errMsg = '001'; // Error sending the message
+           dlvrdMsg = '000'; // No message was delivered
         };
 
-
-        //Probably the submit receipt is sent like this:
-        //        REGISTERED_DELIVERY: {
-        //        FINAL:                    0x01,
-        //        FAILURE:                  0x02,
-
-        //REGISTERED_DELIVERY.FINAL | REGISTERED_DELIVERY.FAILURE = 0x03
-
-        //The delivery reports are sent to the client using the 'deliver_sm' packet.
-        //This is the same packet as used to deliver incoming messages.
-        //To detect whether a 'deliver_sm' is a delivery report or a message, you have to check the 'esm_class' field.
-        //    If bit 2 of this byte is set ( 0x04 ), it is a delivery report.
-        //To use delivery reports, you have to setup a transceiver connection to the SMPP provider, because you are going to send and receive messages.
-        //The delivery status is encoded in the 'short_message' field as an ASCII text message.
-        //This format is product specific, but the following format is used by most SMPP providers:
-        //id:c449ab9744f47b6af1879e49e75e4f40 sub:001 dlvrd:0 submit date:0610191018 done date:0610191018 stat:ACCEPTD err:0 text:This is an Acti
-        //id:7220bb6bd0be98fa628de66590f80070 sub:001 dlvrd:1 submit date:0610190851 done date:0610190951 stat:DELIVRD err:0 text:This is an Acti
-        //id:b756c4f97aa2e1e67377dffc5e2f7d9b sub:001 dlvrd:0 submit date:0610191211 done date:0610191211 stat:REJECTD err:1 text:This is an Acti
-        //id:bd778cd76ae9e79da2ddc8188c68f8c1 sub:001 dlvrd:0 submit date:0610191533 done date:0610191539 stat:UNDELIV err:1 text:This is an Acti
-
-        if((pdu.registered_delivery & 0x01) == 0x01) {
+        if((pdu.registered_delivery & 0x01) == 0x01) { //If the submitted message requested a delivery receipt we build and send back the delivery request.
         //if((pdu.registered_delivery & pdu.REGISTERED_DELIVERY.FINAL) == pdu.REGISTERED_DELIVERY.FINAL){
             var dlReceipt = '';
 
+            //This is the text to be sent in the message text of the delivery receipt:
             dlReceipt = 'id:' + hexidMsg + ' sub:001 dlvrd:' + dlvrdMsg +
                 ' submit date:' + submitDate + ' done date:' + doneDate + ' stat:' + statMsg + ' err:' + errMsg + ' text:' + msgText;
 
             smppSession.deliver_sm({
-                source_addr: pdu.destination_addr,
+                source_addr: pdu.destination_addr, //Send back the delivery receipt to the submitter as if it was sent by the recipient of the message
                 source_addr_ton: 1,
                 source_addr_npi: 0,
-                destination_addr: shortNumber,
+                destination_addr: shortNumber, //send it to the service short number
                 destination_addr_ton: 1,
                 destination_addr_npi: 0,
-                esm_class: 4,
+                esm_class: 4, //This is a delivery receipt
                 data_coding: 0,
                 short_message: dlReceipt,
-                message_state: statMsgValue,
-                receipted_message_id: hexidMsg
+                message_state: statMsgValue,    // \_ These two message options should be added to a delivery receipt
+                receipted_message_id: hexidMsg  // /
             }, function(pdu) {
                 if (pdu.command_status === 0) {
                     // Message successfully sent
-                    console.log("Delievry Receipt sent!");
+                    console.log("Delivery receipt sent!");
                 }
             });
         };
 
-        idMsg++;
+        idMsg++; //it counts the messages that were processed: they were tried to be delivered, successfully or not.
 
     });
 
     smppSession.on('deliver_sm', function(pdu) {
-        console.log("deliver_sm received" + pdu);
+        console.log("deliver_sm received: " + pdu);
         if (pdu.esm_class == 4) {
             var shortMessage = pdu.short_message;
             console.log('Received DR: %s', shortMessage.trim());
@@ -297,7 +287,7 @@ function sendSMS(from, to, text) {
             }, function(pdu) {
                 if (pdu.command_status === 0) {
                     // Message successfully sent
-                    console.log("message sent");
+                    console.log("Message sent!");
                 }
             });
         }
@@ -346,7 +336,7 @@ function sendSMS(from, to, text) {
                 }, function(pdu) {
                     if (pdu.command_status === 0) {
                         // Message successfully sent
-                        console.log("multipart message sent");
+                        console.log("Multipart message sent!");
                     }
                 });
 
@@ -359,7 +349,7 @@ function sendSMS(from, to, text) {
 
 io.on('connection', function(socket) {
 
-    console.log("connection received");
+    console.log("Connection received!");
     clients.push(socket);
 
     socket.emit(socket.handshake.session);
