@@ -56,9 +56,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, 'node_modules'))); //TODO: Adapt this root for JsSIP also so it won;t be necessary to use next one:
+app.use(express.static(path.join(__dirname, 'node_modules'))); //TODO: Adapt this root for JsSIP also so it won't be necessary to use next one:
 // JsSIP is not designed to use "express" library. To be loaded we need its path:
-app.use(express.static(path.join(__dirname, 'node_modules/jssip/dist')));
+//app.use(express.static(path.join(__dirname, 'node_modules/jssip/dist')));
 
 var express_middleware = session({
     secret: 'aut0test',
@@ -138,7 +138,7 @@ var smppServer = smpp.createServer(function(session) {
         var statMsg = stateMsg.DELIVERED.Status; //'DELIVRD'; // \_The state of the message is encoded with both letters and numbers
         var statMsgValue = stateMsg.DELIVERED.Value;          // / The default state of the message is "delivered"
         var errMsg = '000'; //No error in message delivery.
-        var dlvrdMsg = '001'; //One message delivered. This is a constant for our server since we do not support multiple recipients.
+        var dlvrdMsg = '001'; //One message delivered. This is a constant for our server since we do not support multiple recipients. Actually it does support multiple messages!
         var endmsgText = 20;  //The snippet of message to be transmitted back in delivery report will be of maximum 20 characters.
         var msgText = 'Message acknowledged';
 
