@@ -367,13 +367,6 @@ io.on('connection', function(socket) {
 
     socket.emit(socket.handshake.session);
 
-    if (!socket.handshake.session.onemContext) { //must be first time, or expired
-        var msisdn = moment().format('YYMMDDHHmmSS');
-        console.log("msisdn:" + msisdn);
-        socket.handshake.session.onemContext = { msisdn : msisdn};
-        socket.handshake.session.save();
-    }
-
     socket.on('MO SMS', function(moText) {
         console.log('moText: ');
         console.log(moText);
