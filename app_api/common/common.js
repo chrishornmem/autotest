@@ -24,10 +24,13 @@ exports.createJWT = function (user) {
     return jwt.encode(payload, process.env.TOKEN_SECRET);
 }
 
-exports.decodeJWT = function (token) {
-    var payload;
+exports.decodeJWT = function (token, noVerify) {
+    var payload, noValidate = false;
+    if (noVerify === true) {
+        noValidate = true;
+    }
     try {
-        payload = jwt.decode(token, process.env.TOKEN_SECRET);
+        payload = jwt.decode(token, process.env.TOKEN_SECRET, noValidate);
         return payload;
     }
     catch (err) {
