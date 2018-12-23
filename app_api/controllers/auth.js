@@ -22,6 +22,8 @@ exports.googleAuth = function(User) {
           var headers = { Authorization: 'Bearer ' + accessToken };
 
           console.log("id_token:");
+          // according to google, we can trust this token without validating it
+          // https://developers.google.com/identity/protocols/OpenIDConnect
           googleJWTToken = common.decodeJWT(response.body.id_token, true);
 
           console.log("googleJWTToken:");
